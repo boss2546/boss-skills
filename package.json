@@ -1,11 +1,13 @@
 {
-  "name": "boss-ai",
+  "name": "boss-skill",
   "version": "1.0.0",
-  "description": "Universal AI Agent Skills Installer: Docker 3-Tier Workflow + Git Team Workflow for Claude Code, Cursor, GitHub Copilot, Antigravity, Windsurf, Cline",
+  "description": "Universal AI Agent Skills: Docker 3-Tier Workflow + Git Team Workflow for Claude Code, Cursor, GitHub Copilot, Antigravity, Windsurf, Cline",
   "main": "bin/install.js",
   "bin": {
-    "boss-ai": "bin/install.js",
-    "boss": "bin/install.js"
+    "boss-skill": "bin/install.js",
+    "boss": "bin/install.js",
+    "boss-skills": "bin/install.js",
+    "boss-ai": "bin/install.js"
   },
   "files": [
     "bin",
@@ -13,7 +15,8 @@
     "README.md"
   ],
   "keywords": [
-    "boss-ai",
+    "boss-skill",
+    "boss-skills",
     "ai-agent",
     "skills",
     "claude",
