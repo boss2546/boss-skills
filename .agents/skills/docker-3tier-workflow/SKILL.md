@@ -1,6 +1,6 @@
 ---
 name: docker-3tier-workflow
-description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ Full-Stack (Frontend, Backend, Database) พร้อม NGINX Gateway, Log Rotation, Auto-Restart, Firewall (UFW) และระบบสำรองข้อมูลระดับ Production สมบูรณ์แบบ 100%
+description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ Full-Stack (Frontend, Backend, Database) พร้อม NGINX Gateway, Log Rotation, Auto-Restart, Firewall (UFW), Cloudflare และ Custom Domain ระดับ Production สมบูรณ์แบบ 100%
 ---
 
 # 🐳 Docker Full-Stack & Production Architecture Skill (ฉบับองค์กรสมบูรณ์ 100%)
@@ -26,10 +26,16 @@ description: มาตรฐานการสร้าง จัดการ �
 ## 🔄 2. กลไกการไหลของข้อมูลระดับ Production (Reverse Proxy Data Flow)
 
 ```text
- 👤 ผู้ใช้งานภายนอก (เปิดเว็บ https://my-system.com)
+ 👤 ผู้ใช้งานทั่วโลก (เปิดเว็บ https://boss-system.com)
       │
       ▼
- 🛡️ [ NGINX Gateway : พอร์ต 80 / 443 ] ── กรองความปลอดภัย + ทำ HTTPS กุญแจเขียว
+ ☁️ [ Cloudflare Edge & CDN ] ── กรองบอท/DDoS, ซ่อน IP จริง, ทำ HTTPS กุญแจเขียวอัตโนมัติ
+      │
+      ▼ (ส่งต่อเข้ามายังเครื่องเซิร์ฟเวอร์อย่างปลอดภัย)
+ 🧱 [ Host Firewall (UFW) : พอร์ต 80 / 443 ] ── รั้วกำแพงด่านแรกของเครื่อง Ubuntu
+      │
+      ▼
+ 🛡️ [ NGINX Gateway : พอร์ต 80 / 443 ] ── จัดการ Reverse Proxy ส่งเข้าตู้ภายใน
       ├── (ถ้าขอหน้าเว็บปกติ /) ────────▶ 🎨 Frontend Container (พอร์ต 3000 ภายใน)
       └── (ถ้าเรียกข้อมูล /api/) ────────▶ 🧠 Backend Container (พอร์ต 3000 ภายใน)
                                                 │
@@ -214,13 +220,46 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 
 ---
 
-## 🛡️ 5. กฎเหล็ก 5 ข้อระดับ Production (Enterprise Golden Rules)
+### 📄 4.5 การเชื่อมต่อ Cloudflare & ชื่อโดเมน (Internet Exposure & Cloudflare Guide)
+
+เมื่อต้องการเปิดให้คนทั้งโลกเข้าใช้งานผ่านชื่อโดเมนของตนเอง (เช่น `https://boss-system.com`):
+
+#### 🌐 ทางเลือกที่ 1: ชี้ DNS ตรงผ่าน Cloudflare (สำหรับเซิร์ฟเวอร์ที่มี Public IP)
+1. จดชื่อโดเมน (Domain Name) จากผู้ให้บริการ (เช่น Namecheap, GoDaddy, Cloudflare Registrar)
+2. นำโดเมนไปผูกกับ Cloudflare (ใช้งานฟรี) โดยเปลี่ยน Nameservers ตามที่ Cloudflare แนะนำ
+3. สร้าง **DNS Records (A Record)**:
+   * **Type:** `A` | **Name:** `@` (หรือ `www`) | **IPv4 address:** `[IP เซิร์ฟเวอร์จริงของคุณ]`
+   * **Proxy status:** **เปิดเป็น "Proxied (ก้อนเมฆสีส้ม ☁️)" เสมอ** เพื่อซ่อน IP เซิร์ฟเวอร์จริง ป้องกัน DDoS และรับ HTTPS กุญแจเขียวฟรี
+4. ในไฟล์ `nginx/nginx.conf` ให้ตั้งค่า `server_name boss-system.com;`
+
+#### 🚇 ทางเลือกที่ 2: ใช้ Cloudflare Tunnel (สำหรับเซิร์ฟเวอร์ที่ไม่มี Public IP / อยู่หลังเราเตอร์)
+ไม่ต้องขอ Public IP ไม่ต้องเปิดพอร์ตเราเตอร์ เพียงเพิ่มตู้ `cloudflared` เข้าไปใน `compose.yaml`:
+
+```yaml
+  # 🚇 Cloudflare Tunnel เจาะท่อปลอดภัยออกสู่อินเทอร์เน็ต
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: app_tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - nginx
+    logging: *default-logging
+```
+> 💡 **ข้อดีของ Tunnel:** ปลอดภัยที่สุดในโลก ไม่ต้องเปิดพอร์ต 80/443 รับคนแปลกหน้าเข้าเครื่องเลย เพราะตู้จะเจาะท่อออกจากในเซิร์ฟเวอร์ไปหา Cloudflare เอง
+
+---
+
+## 🛡️ 5. กฎเหล็ก 6 ข้อระดับ Production (Enterprise Golden Rules)
 
 1. **🔒 ห้ามเปิดพอร์ต DB และ Backend ออกสู่อินเทอร์เน็ตตรงๆ:** ต้องผ่าน NGINX Gateway เสมอ
 2. **🧹 ต้องมี Log Rotation เสมอ (`max-size: 10m`):** ป้องกันไม่ให้ไฟล์ล็อกแอบสูบพื้นที่ 264 GB บนเซิร์ฟเวอร์จนเต็ม
 3. **🔄 ใส่ `restart: unless-stopped` ทุกตู้:** เมื่อเครื่องเซิร์ฟเวอร์รีสตาร์ท ทุกตู้ต้องฟื้นขึ้นมาทำงานต่อทันที
 4. **🇹🇭 ฐานข้อมูลต้องใช้ `utf8mb4` เสมอ:** ข้อมูลภาษาไทยต้องไม่แสดงผลเป็น `???`
 5. **🧱 เปิด Firewall เฉพาะพอร์ตจำเป็น:** บนเครื่องเซิร์ฟเวอร์ (Ubuntu UFW) เปิดเฉพาะพอร์ต 22 (SSH), 80 (HTTP), 443 (HTTPS) เท่านั้น เพื่อป้องกันไม่ให้ผู้ไม่ประสงค์ดีแฮกผ่านพอร์ตอื่น
+6. **☁️ ปกป้องเซิร์ฟเวอร์ด้วย Cloudflare เสมอ:** ไม่เปิดเผย IP จริงของเซิร์ฟเวอร์สู่อินเทอร์เน็ต เปิด Proxy (เมฆสีส้ม ☁️) หรือใช้ Cloudflare Tunnel เพื่อป้องกันการโดนยิงเว็บล่ม (DDoS) และรับกุญแจเขียว HTTPS ฟรี
 
 ---
 
@@ -257,3 +296,9 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
   > "โปรเจกต์นี้กำลังจะนำไป Deploy บน Ubuntu Server ช่วยตรวจเช็ค compose.yaml, .dockerignore และ .env.example ให้พร้อมรันด้วย docker compose up -d --build ในคำสั่งเดียวให้หน่อย"
 * **3.2 ตั้งค่า Firewall (UFW) บน Ubuntu:**
   > "ช่วยเขียนคำสั่งตั้งค่าไฟร์วอลล์ ufw บน Ubuntu ให้เปิดเฉพาะพอร์ต 22, 80, 443 ตามมาตรฐานความปลอดภัยของสกิล docker-3tier-workflow ให้หน่อย"
+
+### 🌐 หมวดที่ 4: เชื่อมต่อ Cloudflare และชื่อโดเมน (Domain & Cloudflare)
+* **4.1 แนะนำการผูกโดเมนเข้ากับ Cloudflare:**
+  > "ฉันเพิ่งซื้อชื่อโดเมนเนมมา ช่วยแนะนำขั้นตอนนำโดเมนไปผูกกับ Cloudflare และตั้งค่า DNS ชี้มาที่เซิร์ฟเวอร์ NGINX พร้อมเปิดก้อนเมฆสีส้มทีละสเต็ปหน่อย"
+* **4.2 เพิ่ม Cloudflare Tunnel ใน compose.yaml:**
+  > "เซิร์ฟเวอร์ของฉันไม่มี Public IP ช่วยเขียนคอนฟิกเพิ่มตู้ cloudflared เข้าไปใน compose.yaml ของโปรเจกต์นี้ เพื่อให้คนภายนอกเข้าเว็บผ่านชื่อโดเมนได้โดยไม่ต้องเปิดพอร์ตเราเตอร์ให้หน่อย"

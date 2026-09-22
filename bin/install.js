@@ -57,6 +57,7 @@ When designing, containerizing, or managing Docker environments in this project:
    - **Database Healthcheck**: DB must have \`healthcheck\` and Backend must use \`depends_on: db: condition: service_healthy\`.
    - **Dynamic RAM**: Allow containers to share host memory dynamically without hard ceilings, preventing sudden OOM container termination (Exit Code 137).
    - **Host Firewall (UFW)**: On Ubuntu host, allow only ports 22 (SSH), 80 (HTTP), and 443 (HTTPS); deny all other incoming.
+   - **Cloudflare & Domain**: Protect server with Cloudflare Proxied (Orange Cloud ☁️) or Cloudflare Tunnel (cloudflared) to hide origin IP and enable free automatic SSL.
    - **CORS & Proxy Headers**: NGINX / Backend must forward \`Host\`, \`X-Real-IP\`, \`X-Forwarded-For\`.
 3. **Database Client Tools (DBeaver / DataGrip)**:
    - For MySQL 8+, ensure \`allowPublicKeyRetrieval=true\` in Driver Properties.
