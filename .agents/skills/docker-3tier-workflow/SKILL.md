@@ -1,191 +1,244 @@
 ---
 name: docker-3tier-workflow
-description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ 3 ตู้ (Frontend, Backend, Database) ด้วย Docker และ Docker Compose พร้อมแนวทางการอธิบายแบบเข้าใจง่ายเป็นขั้นตอน
+description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ Full-Stack (Frontend, Backend, Database) พร้อม NGINX Gateway, Log Rotation, Auto-Restart และระบบสำรองข้อมูลระดับ Production สมบูรณ์แบบ 100%
 ---
 
-# 🐳 Docker 3-Tier Full-Stack Skill (ฉบับสมบูรณ์ 100%)
+# 🐳 Docker Full-Stack & Production Architecture Skill (ฉบับองค์กรสมบูรณ์ 100%)
 
-คู่มือมาตรฐานระดับสากลสำหรับ AI ในการร่วมงานกับผู้ใช้เพื่อสร้าง ออกแบบ และดูแลระบบด้วย Docker
-
----
-
-## 🎯 1. สถาปัตยกรรมหลัก: กฎ 3 ตู้ (ร้านอาหารโมเดล)
-
-เมื่อผู้ใช้ต้องการสร้างระบบเว็บ ให้ยึดโครงสร้าง **แยก 3 ตู้เสมอ** (ห้ามยัดรวมกันในตู้เดียว):
-
-| ตู้ / Service | หน้าที่เปรียบเทียบ | หน้าที่ในระบบ | พอร์ตภายนอกแนะนำ |
-| :--- | :--- | :--- | :--- |
-| **🎨 1. Frontend** | **หน้าร้าน / เมนูอาหาร** | **คุยกับคน (ผู้ใช้):** แสดงผลหน้าจอ ปุ่มกด ฟอร์มกรอกข้อมูล (HTML/CSS/JS หรือ React/Vue/Vite) | `3000` หรือ `80` |
-| **🧠 2. Backend** | **ห้องครัว / พ่อครัว** | **คิดคำนวณและตรรกะ:** รับคำสั่งจากหน้าบ้าน ตรวจสอบความถูกต้อง แล้วสั่งบันทึกข้อมูล (Node.js, Express, Python) | `3001` หรือ `5000` |
-| **🗄️ 3. Database** | **ตู้เย็นแช่ของ / โกดัง** | **เก็บของลงฮาร์ดดิสก์:** บันทึกข้อมูลลงฐานข้อมูลอย่างถาวร ปิดเครื่องก็ไม่หาย (MySQL 8, Postgres) | `3307` (MySQL) หรือ `5433` (Postgres) |
+คู่มือมาตรฐานระดับสากลสำหรับ AI ในการร่วมงานกับผู้ใช้เพื่อสร้าง ออกแบบ ดูแล และ Deploy ระบบ Full-Stack ด้วย Docker ตั้งแต่ระดับพัฒนา (Development) จนถึงระดับใช้งานจริงในองค์กร (Production)
 
 ---
 
-## 🔄 2. กลไกการไหลของข้อมูล และกฎเรื่อง CORS (Data Flow & CORS)
+## 🎯 1. สถาปัตยกรรมหลัก: ร้านอาหารโมเดล + ด่านหน้า NGINX
 
-AI ต้องเข้าใจการทำงานประสานกันของทั้ง 3 ตู้ และ **ต้องปลดล็อก CORS เสมอ**:
+ในการสร้างระบบระดับมืออาชีพ ให้ยึดโครงสร้าง **4 บทบาทหลัก** เสมอ (ห้ามยัดรวมในตู้เดียวเด็ดขาด):
+
+| ตู้ / Service | บทบาทในร้านอาหาร | หน้าที่ในระบบจริง | พอร์ตภายนอก (Dev) | พอร์ตภายนอก (Production) |
+| :--- | :--- | :--- | :--- | :--- |
+| **🛡️ 0. NGINX Gateway** | **รปภ. & พนักงานต้อนรับหน้าประตู** | รับแขกหน้าสุด ตรวจความปลอดภัย (HTTPS/SSL), บีบอัดข้อมูล, และกระจายคนเข้าถูกห้อง | *(ไม่จำเป็นต้องเปิดใน Dev)* | `80` (HTTP) และ `443` (HTTPS) |
+| **🎨 1. Frontend** | **หน้าร้าน & เล่มเมนูอาหาร** | หน้าจอเว็บ UI ปุ่มกด ฟอร์มกรอกข้อมูล (Next.js, React, Vue, Vite, HTML/CSS) | `3000` | ปิดพอร์ตภายนอก (ให้ NGINX คุยข้างใน) |
+| **🧠 2. Backend API** | **ห้องครัว & พ่อครัวปรุงอาหาร** | ตรรกะ คิดคำนวณ ตรวจสิทธิ์ และสั่งบันทึกข้อมูล (Python FastAPI, Node.js, Go) | `3001` | ปิดพอร์ตภายนอก (ให้ NGINX คุยข้างใน) |
+| **🗄️ 3. Database** | **ตู้เย็นแช่ของ & โกดังวัตถุดิบ** | จัดเก็บข้อมูลถาวรลงฮาร์ดดิสก์ ปิดเครื่องข้อมูลไม่หาย (MySQL 8.4, PostgreSQL) | `3307` | ปิดพอร์ตภายนอก หรือเปิดเฉพาะให้ Admin |
+| **💾 4. DB Backup (เสริม)** | **ตู้เซฟสำรองฉุกเฉิน** | แอบดัมป์ข้อมูลฐานข้อมูลเก็บไว้ทุกเที่ยงคืน ย้อนหลัง 7 วัน ป้องกันข้อมูลสูญหาย | — | รันทำงานเบื้องหลังอัตโนมัติ |
+
+---
+
+## 🔄 2. กลไกการไหลของข้อมูลระดับ Production (Reverse Proxy Data Flow)
 
 ```text
- 👤 ผู้ใช้งาน
-      │ (1. เปิดเว็บ / พิมพ์ข้อมูลในฟอร์ม แล้วกดปุ่ม)
+ 👤 ผู้ใช้งานภายนอก (เปิดเว็บ https://my-system.com)
+      │
       ▼
- 🎨 Frontend (หน้าบ้าน - พอร์ต 3000)
-      │ (2. ส่งคำสั่ง HTTP Request ข้ามพอร์ตไปหาพอร์ต 3001)
-      ▼ ⚠️ [ต้องเปิด CORS ที่หลังบ้าน ไม่งั้นเบราว์เซอร์จะบล็อก!]
- 🧠 Backend (หลังบ้าน - พอร์ต 3001)
-      │ (3. ตรวจสอบข้อมูล คิดคำนวณ แล้วส่งคำสั่ง SQL ไปที่ฐานข้อมูล)
-      ▼
- 🗄️ Database (โกดังเก็บของ - พอร์ต 3306 ภายใน)
-      │ (4. บันทึกข้อมูลลงดิสก์ถาวร แล้วตอบกลับว่า "บันทึกสำเร็จ")
-      ▼
- 🧠 Backend (หลังบ้าน)
-      │ (5. ส่งผลลัพธ์กลับไปแจ้งหน้าบ้าน)
-      ▼
- 🎨 Frontend ➔ แสดงข้อความแจ้งเตือนสีเขียว "ทำรายการสำเร็จ!" ให้ผู้ใช้เห็น
+ 🛡️ [ NGINX Gateway : พอร์ต 80 / 443 ] ── กรองความปลอดภัย + ทำ HTTPS กุญแจเขียว
+      ├── (ถ้าขอหน้าเว็บปกติ /) ────────▶ 🎨 Frontend Container (พอร์ต 3000 ภายใน)
+      └── (ถ้าเรียกข้อมูล /api/) ────────▶ 🧠 Backend Container (พอร์ต 3000 ภายใน)
+                                                │
+                                                ▼ (สั่งงานผ่าน Network ภายใน)
+                                          🗄️ Database Container (MySQL 3306 ภายใน)
+                                                ▲
+                                                │ (แอบสำรองข้อมูลทุกคืน)
+                                          💾 Backup Service (เก็บย้อนหลัง 7 วัน)
 ```
 
 ---
 
-## 📁 3. โครงสร้างโฟลเดอร์มาตรฐาน (Monorepo Layout)
+## 📁 3. โครงสร้างโฟลเดอร์มาตรฐานระดับ Production
 
 ```text
 my-project/
-├── compose.yaml          # ผู้จัดการใหญ่ คุมเปิด 3 ตู้พร้อมกัน และทำหน้าที่เป็นสายแลนเชื่อมหากัน
-├── .dockerignore         # รายการของต้องห้ามสำหรับทั้งโปรเจกต์
-├── frontend/             # โฟลเดอร์หน้าบ้าน (มี Dockerfile ของตัวเอง)
+├── compose.yaml              # โครงสร้างเปิดรันทุกตู้พร้อมกัน
+├── .env.example              # ตัวอย่างตัวแปรคอนฟิก (ห้ามใส่รหัสจริง)
+├── .env                      # รหัสจริงของเครื่องนั้น (ห้ามดันขึ้น Git เด็ดขาด)
+├── .dockerignore             # ป้องกันไฟล์ขยะหลุดเข้าตู้
+├── nginx/                    # คอนฟิกด่านหน้า NGINX
+│   └── nginx.conf            # กฎการแจกจ่ายงานและ HTTPS
+├── frontend/                 # ตู้หน้าบ้าน
 │   ├── Dockerfile
-│   └── (code)
-└── backend/              # โฟลเดอร์หลังบ้าน (มี Dockerfile ของตัวเอง)
-    ├── Dockerfile
-    ├── package.json      # คำสั่ง start ควรใช้ "node --watch app.js" เพื่อให้แก้โค้ดสดได้
-    └── (code)
+│   └── (source code)
+├── backend/                  # ตู้หลังบ้าน
+│   ├── Dockerfile
+│   └── (source code)
+└── backups/                  # โฟลเดอร์เก็บไฟล์สำรองฐานข้อมูลอัตโนมัติ
 ```
 
 ---
 
-## 📋 4. แม่แบบไฟล์มาตรฐาน (Standard Templates)
+## 📋 4. แม่แบบไฟล์มาตรฐานระดับ Production (The Golden Templates)
 
-### 📄 compose.yaml มาตรฐาน (พร้อมระบบกันบั๊ก 3 จุดสำคัญ)
+### 📄 4.1 แม่แบบ `compose.yaml` ระดับ Production (ครบ 5 เสาหลัก)
+
 ```yaml
 services:
+  # 🛡️ 0. NGINX Gateway ด่านหน้ารับแขก
+  nginx:
+    image: nginx:alpine
+    container_name: app_gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    logging: &default-logging
+      driver: "json-file"
+      options:
+        max-size: "10m"       # 🧹 กันดิสก์เต็ม: ไฟล์ Log ห้ามเกิน 10MB
+        max-file: "3"         # หมุนเวียนเก็บแค่ 3 ไฟล์เก่า
+
+  # 🎨 1. Frontend
   frontend:
     build: ./frontend
     container_name: app_frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+    restart: unless-stopped
+    expose:
+      - "3000"                # เปิดให้เฉพาะ NGINX คุยข้างใน ไม่เปิดออกนอกเครื่อง
+    deploy:
+      resources:
+        limits:
+          memory: 512M        # 🎛️ ล็อกเพดาน RAM สูงสุด 512MB
+    logging: *default-logging
 
+  # 🧠 2. Backend API
   backend:
     build: ./backend
     container_name: app_backend
-    ports:
-      - "3001:3000"
-    depends_on:
-      db:
-        condition: service_healthy   # ⏱️ รอให้ฐานข้อมูลวอร์มเครื่องเสร็จ 100% ก่อน เว็บถึงค่อยเปิดตาม
+    restart: unless-stopped
+    expose:
+      - "3000"
     environment:
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: mydb
-      DB_USER: root
-      DB_PASSWORD: secret123
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+      DB_NAME: ${DB_NAME:-mydb}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-secret123}
+    depends_on:
+      db:
+        condition: service_healthy   # ⏱️ รอจนกว่า MySQL จะวอร์มเครื่องเสร็จ 100%
+    deploy:
+      resources:
+        limits:
+          memory: 1G          # 🎛️ ล็อกเพดาน RAM ไม่เกิน 1GB
+    logging: *default-logging
 
+  # 🗄️ 3. Database (MySQL 8.4)
   db:
     image: mysql:8.4
     container_name: app_db
-    restart: always
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci  # 🇹🇭 รองรับภาษาไทย 100% ไม่เป็น ???
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_ROOT_PASSWORD: secret123
-      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret123}
+      MYSQL_DATABASE: ${DB_NAME:-mydb}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306" # ล็อกให้ต่อได้เฉพาะจากในเครื่องเซิร์ฟเวอร์เท่านั้น
     volumes:
       - db_data:/var/lib/mysql
-    healthcheck:                     # 🩺 ตรวจสอบว่าฐานข้อมูลพร้อมรับคนหรือยัง
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret123"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-secret123}"]
       interval: 5s
       timeout: 5s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    logging: *default-logging
 
 volumes:
   db_data:
 ```
 
-### 📄 .dockerignore มาตรฐาน
-```text
-node_modules
-npm-debug.log
-.DS_Store
-.vscode
-.idea
-.git
-.gitignore
+---
+
+### 📄 4.2 แม่แบบคอนฟิก `nginx/nginx.conf`
+
+```nginx
+events { worker_connections 1024; }
+
+http {
+    include mime.types;
+    sendfile on;
+
+    # อัปโหลดไฟล์ได้สูงสุด 50MB
+    client_max_body_size 50M;
+
+    upstream frontend_service {
+        server frontend:3000;
+    }
+
+    upstream backend_service {
+        server backend:3000;
+    }
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        # ส่งคำสั่ง /api/ ไปหาตู้หลังบ้าน Backend
+        location /api/ {
+            proxy_pass http://backend_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # คำสั่งอื่นๆ ส่งไปหาตู้หน้าบ้าน Frontend
+        location / {
+            proxy_pass http://frontend_service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+}
 ```
 
 ---
 
-## ⚠️ 5. กฎเหล็กในการทำงานของ AI (Communication Rules)
+## 🛡️ 5. กฎเหล็ก 5 ข้อระดับ Production (Enterprise Golden Rules)
 
-1. **ไปทีละสเต็ป (Step-by-Step):** 
-   * ห้ามสร้างโค้ดยาวเหยียด 10 ไฟล์ในครั้งเดียว ให้แนะนำทีละขั้น ตรวจสอบทีละไฟล์
-2. **ภาษาและคำอธิบาย (Kindergarten Style):** 
-   * อธิบายด้วยภาพเปรียบเทียบที่เห็นภาพง่าย ไม่ใช้ศัพท์เทคนิคล้วน
-   * เวลาให้คำสั่ง Terminal ให้อธิบายความหมายคำต่อคำ (เช่น `-d`, `--name`, `-p`)
-3. **ป้องกันข้อผิดพลาดล่วงหน้า:**
-   * เตือนเรื่องการ Save ไฟล์ (`Cmd + S`)
-   * ตรวจสอบเรื่องการเคาะเว้นวรรค (YAML Spacing) และจุด `.` หลังคำสั่ง `build`
-   * ตรวจสอบว่าพอร์ตซ้ำกับระบบอื่นในเครื่องหรือไม่
-   * **เปิด CORS ที่ Backend เสมอ** เพื่อไม่ให้หน้าบ้านดึงข้อมูลแล้วโดนบล็อก
+1. **🔒 ห้ามเปิดพอร์ต DB และ Backend ออกสู่อินเทอร์เน็ตตรงๆ:** ต้องผ่าน NGINX Gateway เสมอ
+2. **🧹 ต้องมี Log Rotation เสมอ (`max-size: 10m`):** ป้องกันไม่ให้ไฟล์ล็อกแอบสูบพื้นที่ 264 GB บนเซิร์ฟเวอร์จนเต็ม
+3. **🔄 ใส่ `restart: unless-stopped` ทุกตู้:** เมื่อเครื่องเซิร์ฟเวอร์รีสตาร์ท ทุกตู้ต้องฟื้นขึ้นมาทำงานต่อทันที
+4. **🇹🇭 ฐานข้อมูลต้องใช้ `utf8mb4` เสมอ:** ข้อมูลภาษาไทยต้องไม่แสดงผลเป็น `???`
+5. **🎛️ กำหนด Resource Limits:** ล็อกเพดาน RAM ของแต่ละตู้ เพื่อไม่ให้ตู้ใดตู้หนึ่งเกิด Memory Leak แล้วดึง RAM ของเครื่องแม่ข่ายจนค้าง
 
 ---
 
-## 🔍 6. คู่มือแก้ปัญหาด่วน (Troubleshooting Checklist)
+## 🔍 6. คู่มือแก้ปัญหาด่วนระดับ Production (Enterprise Troubleshooting)
 
-* **Port ชน (`already allocated`):** ตรวจสอบพอร์ตภายนอก เปลี่ยนเลขตัวหน้า (เช่น `3001:3000`)
-* **ตู้ดับทันที (`Exited`):** ให้ผู้ใช้รัน `docker logs <ชื่อตู้>` เสมอเพื่อหาสาเหตุ
-* **หน้าบ้านเรียกหลังบ้านแล้วบล็อก (CORS Error):** ติดตั้งแพ็กเกจ `cors` ใน Backend (`npm install cors`) แล้วใส่ `app.use(cors())`
-* **ข้อมูลภาษาไทยใน MySQL กลายเป็น `???`:** ใส่ `command: --character-set-server=utf8mb4 ...` ในตู้ db
-* **เว็บสตาร์ทแล้วหลุด `ECONNREFUSED` (ฐานข้อมูลยังไม่ตื่น):** ใส่ `condition: service_healthy` ใน `depends_on`
-* **YAML พัง (`must be a mapping` หรือ `could not find ':'`):** ตรวจสอบเครื่องหมาย `:` และการเคาะ Spacebar 1 ครั้งหลัง `:`
-* **DBeaver ต่อ MySQL 8 ไม่ได้:** ตั้งค่าใน `Driver properties` ให้ `allowPublicKeyRetrieval = true`
+* **502 Bad Gateway จาก NGINX:** ตู้ข้างใน (Frontend หรือ Backend) กำลังดับ หรือยังสตาร์ทไม่เสร็จ ให้สั่ง `docker logs app_backend` ดูสาเหตุ
+* **Error OOM (Out Of Memory / Exit 137):** ตู้กิน RAM ทะลุเพดานที่ล็อกไว้ ให้ขยับ `limits: memory` ใน `compose.yaml` เพิ่มขึ้น
+* **ฮาร์ดดิสก์เซิร์ฟเวอร์เต็ม (`No space left on device`):** สั่งรันคำสั่งล้างภาพและ Cache ขยะ:
+  ```bash
+  docker system prune -a --volumes=false
+  ```
+  *(คำสั่งนี้ปลอดภัย ไม่ลบข้อมูลใน Volume ฐานข้อมูลครับ)*
+* **DBeaver ต่อ MySQL 8+ ในเซิร์ฟเวอร์ไม่ได้:** ตั้งค่า Driver Properties: `allowPublicKeyRetrieval=true`
 
 ---
 
-## 💬 7. คลังคำสั่งสำเร็จรูปสำหรับผู้ใช้ (The Ultimate Magic Prompts)
+## 💬 7. คลังคำสั่งสำเร็จรูปสำหรับผู้ใช้ (Production Magic Prompts)
 
-ผู้ใช้สามารถก๊อปปี้ข้อความเหล่านี้ไปสั่ง AI ได้ทันที แล้ว AI จะจัดการตามวิธีที่ถูกต้องให้ครบถ้วน:
+ผู้ใช้สามารถก๊อปปี้ข้อความเหล่านี้ไปสั่ง AI ได้ทันที:
 
-### 🌟 กลุ่มที่ 1: การเริ่มและปรับโครงสร้าง
-* **1.1 ปรับโครงสร้างโปรเจกต์เดิมให้รองรับ Docker 3 ตู้ (Migration):**
-  > "ช่วยปรับโครงสร้างโค้ดและไฟล์ทั้งหมดในโปรเจกต์นี้ ให้รองรับ Docker ตามมาตรฐาน 3 ตู้ (docker-3tier-workflow) ให้หน่อย: สำรวจไฟล์ปัจจุบัน จัดลง frontend/ และ backend/, ทำ Dockerfile แต่ละตู้, สร้าง .dockerignore และ compose.yaml พร้อม Volume แก้โค้ดสด รองรับภาษาไทยและ CORS ทำทีละสเต็ปนะ"
-* **1.2 เริ่มโปรเจกต์ใหม่ตั้งแต่ศูนย์ (Scaffolding):**
-  > "ฉันจะเริ่มทำโปรเจกต์ใหม่ ช่วยวางโครงสร้างระบบแบบ 3 ตู้ด้วย Docker Compose (docker-3tier-workflow) ให้หน่อย: Frontend พอร์ต 3000, Backend พอร์ต 3001, Database MySQL 8.4 พอร์ต 3307 พร้อมตั้งค่า UTF-8 ภาษาไทยและ CORS ให้เสร็จสรรพ"
+### 🌟 หมวดที่ 1: ยกระดับระบบสู่ Production (Enterprise Upgrade)
+* **1.1 เพิ่ม NGINX Gateway ด่านหน้า:**
+  > "ช่วยเพิ่มตู้ NGINX Gateway รับพอร์ต 80/443 และสร้างไฟล์ nginx/nginx.conf เพื่อเชื่อมต่อ Frontend และ Backend ตามมาตรฐานสกิล docker-3tier-workflow ให้หน่อย"
+* **1.2 ตั้งค่าระบบป้องกันดิสก์เต็มและ Auto-Restart:**
+  > "ช่วยปรับ compose.yaml ในโปรเจกต์นี้ให้มี Log Rotation (10MB/3files) และตั้งค่า restart: unless-stopped พร้อมล็อกเพดาน RAM ให้ครบทุกตู้ตามมาตรฐาน Production ให้หน่อย"
 
-### 🛠️ กลุ่มที่ 2: การต่อเติมฟังก์ชัน (สบายขึ้น ไม่ต้องลงโปรแกรมเพิ่ม)
-* **2.1 เพิ่มตู้หน้าเว็บดูฐานข้อมูล (Web GUI - Adminer) ไม่ต้องลง DBeaver:**
-  > "ช่วยเพิ่มตู้ดูฐานข้อมูลผ่านเบราว์เซอร์ (Adminer) ลงใน compose.yaml ตามสกิล docker-3tier-workflow ให้หน่อย ขอพอร์ต 8085 เพื่อให้ฉันเปิดดูตารางในเบราว์เซอร์ได้เลยโดยไม่ต้องลงโปรแกรมในเครื่อง"
-* **2.2 เพิ่มตู้แคชความเร็วสูง (Redis):**
-  > "ช่วยเพิ่มตู้ Redis ลงใน compose.yaml ให้หน่อย พร้อมตั้งชื่อตู้และผูก Network เข้ากับ Backend ตามมาตรฐานสกิล docker-3tier-workflow"
-* **2.3 สลับชนิดฐานข้อมูล (เช่น เปลี่ยนจาก MySQL เป็น PostgreSQL หรือ MongoDB):**
-  > "ฉันต้องการเปลี่ยนฐานข้อมูลจาก MySQL ไปเป็น PostgreSQL ช่วยปรับแก้ compose.yaml และคอนฟิกใน Backend ให้ถูกต้องตามมาตรฐาน โดยย้าย Volume ข้อมูลให้อย่างปลอดภัย"
+### 💾 หมวดที่ 2: การสำรองข้อมูลและกู้คืน (Backup & Restore)
+* **2.1 สั่ง Backup ฐานข้อมูลด่วนทันที:**
+  > "ช่วยเขียนคำสั่ง docker exec สำหรับดัมป์ข้อมูล MySQL ทั้งหมดออกมาเป็นไฟล์ .sql เก็บไว้ในโฟลเดอร์ backups/ วันนี้ทีละสเต็ปหน่อย"
+* **2.2 กู้คืนข้อมูลจากไฟล์ Backup:**
+  > "ฉันมีไฟล์สำรอง database_backup.sql ช่วยเขียนคำสั่งและวิธีนำข้อมูลนี้กลับเข้าไปใส่ในตู้ MySQL ให้หน่อย"
 
-### 📦 กลุ่มที่ 3: การดูแลรักษาและจัดการภายในตู้
-* **3.1 ติดตั้ง Library ใหม่เข้าไปในตู้โดยไม่ต้อง Build ใหม่:**
-  > "ฉันต้องการติดตั้ง library [ชื่อแพ็กเกจ เช่น express หรือ cors] เพิ่มใน Backend ช่วยบอกคำสั่งรันผ่าน docker compose exec หรือจัดการอัปเดตไฟล์ให้ถูกต้องทีละสเต็ปหน่อย"
-* **3.2 ล้างขยะ Docker คืนพื้นที่ฮาร์ดดิสก์ Mac อย่างปลอดภัย:**
-  > "ช่วยบอกคำสั่งและวิธีล้าง Image/Container เก่าๆ ที่ไม่ได้ใช้งานใน Docker เพื่อคืนพื้นที่ฮาร์ดดิสก์ให้ Mac หน่อย ขอวิธีที่ปลอดภัยไม่ลบข้อมูลในฐานข้อมูลนะ"
-
-### 🚨 กลุ่มที่ 4: การสืบสวนและแก้ปัญหา
-* **4.1 สวมบทนักสืบแก้บั๊ก:**
-  > "ฉันรัน Docker แล้วเจอ Error นี้: [แปะข้อความ Error] ช่วยสวมบทนักสืบตามสกิล docker-3tier-workflow อธิบายให้เข้าใจง่ายๆ แบบเด็กอนุบาลว่าพังเพราะอะไร และบอกวิธีแก้ทีละบรรทัดให้ด้วย"
-* **4.2 เช็คสุขภาพและตรวจดูการกินทรัพยากร:**
-  > "ช่วยเขียนคำสั่งตรวจสอบว่าตอนนี้ตู้ไหนกำลังกิน CPU/RAM เท่าไหร่ และตรวจเช็คว่าทุกตู้ยังทำงานปกติดีอยู่ไหม"
-
-### 🤝 กลุ่มที่ 5: การเตรียมส่งต่องาน
-* **5.1 ตรวจความพร้อมก่อนส่งต่อให้เพื่อนหรือ Git:**
-  > "ช่วยตรวจเช็คไฟล์ .dockerignore และ compose.yaml ของโปรเจกต์นี้ให้พร้อมส่งต่อให้เพื่อนร่วมทีมหน่อย และช่วยเขียนสรุปคำสั่ง 1 บรรทัดที่เพื่อนต้องรันให้ด้วย"
+### 🚀 หมวดที่ 3: เตรียมขึ้นเซิร์ฟเวอร์จริง (Deploy to Server)
+* **3.1 เตรียมไฟล์พร้อมรันบน Ubuntu Server:**
+  > "โปรเจกต์นี้กำลังจะนำไป Deploy บน Ubuntu Server ช่วยตรวจเช็ค compose.yaml, .dockerignore และ .env.example ให้พร้อมรันด้วย docker compose up -d --build ในคำสั่งเดียวให้หน่อย"

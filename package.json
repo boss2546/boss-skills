@@ -1,7 +1,7 @@
 {
   "name": "boss-ai",
-  "version": "1.0.0",
-  "description": "Universal AI Agent Skills: Docker 3-Tier Workflow + Git Team Workflow for Claude Code, Cursor, GitHub Copilot, Antigravity, Windsurf, Cline",
+  "version": "1.1.0",
+  "description": "Universal AI Agent Skills: Docker Full-Stack & Production Architecture (NGINX, Log Rotation, Backup) + Git Team Workflow for Claude Code, Cursor, GitHub Copilot, Antigravity, Windsurf, Cline",
   "main": "bin/install.js",
   "bin": {
     "boss-ai": "bin/install.js",
@@ -28,6 +28,8 @@
     "windsurf",
     "cline",
     "docker",
+    "nginx",
+    "production",
     "git"
   ],
   "author": "",

@@ -1,6 +1,6 @@
-# 👑 BOSS AI — Universal Skills Installer
+# 👑 BOSS AI (v1.1.0) — Universal Skills Installer
 
-แพ็กเกจติดตั้งชุดสกิลมาตรฐานสำหรับนักพัฒนาและสาย Vibe Coding: **`Docker 3-Tier Workflow`** + **`Git Team Workflow`** ให้กับ **AI Assistants ทุกตัวในโลก** ในคำสั่งเดียว
+แพ็กเกจติดตั้งชุดสกิลมาตรฐานสำหรับนักพัฒนาและสาย Vibe Coding: **`Docker Full-Stack & Production Architecture`** (NGINX + Enterprise) + **`Git Team Workflow`** ให้กับ **AI Assistants ทุกตัวในโลก** ในคำสั่งเดียว
 
 ---
 
@@ -35,13 +35,15 @@ npx boss-ai --global
 
 ---
 
-## 📦 ในแพ็กเกจนี้ประกอบด้วย 2 สกิลมาตรฐานระดับสากล:
+## 📦 ในแพ็กเกจนี้ประกอบด้วย 2 สกิลมาตรฐานระดับ Production (v1.1.0):
 
-### 1. 🐳 Docker 3-Tier Workflow
-- **ร้านอาหารโมเดล:** แยก 3 ตู้เสมอ — Frontend (3000), Backend API (3001), Database (3307/MySQL 8.4)
-- **ระบบกันบั๊ก:** มี DB `healthcheck` และ Backend `condition: service_healthy` ป้องกันปัญหา `ECONNREFUSED`
-- **ภาษาไทย & ฐานข้อมูล:** รองรับ `utf8mb4` ภาษาไทย 100% พร้อมวิธีตั้งค่า DBeaver (`allowPublicKeyRetrieval=true`)
-- **ปลดล็อก CORS:** ป้องกันหน้าบ้านดึงข้อมูลหลังบ้านแล้วโดนบล็อก
+### 1. 🐳 Docker Full-Stack & Production Architecture (ใหม่ใน v1.1.0 ✨)
+- **🛡️ NGINX Gateway ด่านหน้า:** พอร์ต 80 / 443 รับแขกหน้าสุด ทำหน้าที่เป็น Reverse Proxy ส่งต่อให้ Frontend และ Backend ปิดพอร์ตข้างหลังไม่ให้โดนแฮก
+- **🧹 Log Rotation กันดิสก์เต็ม:** จำกัดขนาด Log สูงสุด 10MB หมุนเวียน 3 ไฟล์ ป้องกันฮาร์ดดิสก์เซิร์ฟเวอร์ 264 GB เต็ม
+- **🔄 Auto-Restart ฟื้นชีพตัวเอง:** ตั้งค่า `restart: unless-stopped` เซิร์ฟเวอร์รีบูต ตู้ฟื้นขึ้นมาทำงานต่อทันที 100%
+- **🎛️ ล็อกเพดาน RAM (Resource Limits):** ล็อก RAM แต่ละตู้ ป้องกัน Memory Leak สูบแรมจนเครื่องค้าง
+- **💾 Auto DB Backup:** กลยุทธ์และแม่แบบสำรองฐานข้อมูล MySQL ทุกคืน ย้อนหลัง 7 วัน
+- **🇹🇭 ภาษาไทย & ฐานข้อมูล:** รองรับ `utf8mb4` ภาษาไทย 100% พร้อมวิธีตั้งค่า DBeaver (`allowPublicKeyRetrieval=true`)
 
 ### 2. 🌿 Git Team Workflow (สำหรับคนที่ทำงานร่วมกับเพื่อน)
 - **โมเดลจุดเซฟเกม & มิติคู่ขนาน:** เข้าใจง่ายแบบเด็กอนุบาล ไม่ใช้ศัพท์เทคนิคซับซ้อน
@@ -69,14 +71,6 @@ boss
 
 ---
 
-## 🌐 การนำไปเผยแพร่ (Publish)
-
-### ทางที่ 1: ผ่าน npmjs.com
-```bash
-npx boss-ai
-```
-
-### ทางที่ 2: ผ่าน GitHub
-```bash
-npx github:boss2546/boss-skills
-```
+## 🌐 ลิงก์สาธารณะ
+* **npm:** [https://www.npmjs.com/package/boss-ai](https://www.npmjs.com/package/boss-ai)
+* **GitHub:** [https://github.com/boss2546/boss-skills](https://github.com/boss2546/boss-skills)

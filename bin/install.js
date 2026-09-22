@@ -25,7 +25,7 @@ const targetAIs = {
 console.log('\n👑 ========================================================================');
 console.log('🚀 BOSS AI — Universal Skills Installer (คำสั่งเดียว ได้ครบทุก AI)');
 console.log('========================================================================');
-console.log(`📦 สกิล: ${[installDocker ? '🐳 Docker 3-Tier Workflow' : '', installGit ? '🌿 Git Team Workflow' : ''].filter(Boolean).join(' + ')}`);
+console.log(`📦 สกิล: ${[installDocker ? '🐳 Docker Full-Stack & Production (NGINX + Enterprise)' : '', installGit ? '🌿 Git Team Workflow' : ''].filter(Boolean).join(' + ')}`);
 console.log(`🎯 โหมด: ${isGlobal ? '🌐 Global (ติดตั้งเข้าแกนกลางของเครื่อง Mac ใช้งานได้ทุกโปรเจกต์)' : '📁 Project Workspace (ติดตั้งเข้าโปรเจกต์ปัจจุบัน)'}`);
 console.log('🤖 AI ที่รองรับ: Claude Code, Cursor, GitHub Copilot/Codex, Antigravity, Windsurf, Cline, Aider\n');
 
@@ -35,23 +35,31 @@ const cwd = process.cwd();
 const dockerSkillSrc = path.join(packageRoot, 'skills', 'docker-3tier-workflow');
 const gitSkillSrc = path.join(packageRoot, 'skills', 'git-team-workflow');
 
-// สรุปกฎ Docker 3-Tier สำหรับ AI
+// สรุปกฎ Docker Fullstack & Production สำหรับ AI
 const dockerRuleSummary = `
-## 🐳 Docker 3-Tier Architecture Standards (Universal AI Guide)
+## 🐳 Docker Full-Stack & Production Architecture Standards (Universal AI Guide)
 When designing, containerizing, or managing Docker environments in this project:
-1. **Architecture (3 Tiers)**:
-   - **Frontend**: Port \`3000:3000\` (Next.js / React / Vite / Vue)
-   - **Backend API**: Port \`3001:3000\` (Node.js / Express / Go / Python)
-   - **Database**: Port \`3307:3306\` (MySQL 8.4+ / PostgreSQL) with \`utf8mb4\` Thai charset
-2. **Docker Compose Reliability Standards**:
-   - Database MUST have a \`healthcheck\` configured (e.g. \`mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD\`).
-   - Backend MUST use \`depends_on: db: condition: service_healthy\` to prevent startup race conditions (\`ECONNREFUSED\`).
-   - Database MUST mount to a named persistent volume (\`volumes: [mysql_data:/var/lib/mysql]\`).
-   - Backend CORS MUST allow requests from Frontend (\`http://localhost:3000\`).
-   - Avoid port 3306 on host; map to 3307 or custom port to prevent collision with local MySQL.
+1. **Architecture (4-Tier Enterprise Pattern)**:
+   - **Gateway (NGINX)**: Port \`80:80\` & \`443:443\` — Entry point, HTTPS/SSL, Reverse Proxy to frontend & backend.
+   - **Frontend**: Internal port \`3000\` (Next.js / React / Vite / Vue) — internal only in production.
+   - **Backend API**: Internal port \`3000\` (Node.js / Python / Go) — internal only in production.
+   - **Database**: Port \`127.0.0.1:3307:3306\` (MySQL 8.4+ / PostgreSQL) with \`utf8mb4\` Thai charset.
+2. **Production Reliability Standards**:
+   - **Auto-Restart**: All services MUST have \`restart: unless-stopped\`.
+   - **Disk Full Prevention (Log Rotation)**: All containers MUST have:
+     \`\`\`yaml
+     logging:
+       driver: "json-file"
+       options:
+         max-size: "10m"
+         max-file: "3"
+     \`\`\`
+   - **Database Healthcheck**: DB must have \`healthcheck\` and Backend must use \`depends_on: db: condition: service_healthy\`.
+   - **Resource Limits**: Protect host memory by capping container RAM (e.g. backend \`limits: memory: 1G\`, db \`2G\`).
+   - **CORS & Proxy Headers**: NGINX / Backend must forward \`Host\`, \`X-Real-IP\`, \`X-Forwarded-For\`.
 3. **Database Client Tools (DBeaver / DataGrip)**:
    - For MySQL 8+, ensure \`allowPublicKeyRetrieval=true\` in Driver Properties.
-4. **Full Reference**: Read detailed workflow and templates in \`.agents/skills/docker-3tier-workflow/SKILL.md\` or \`.claude/skills/docker-3tier-workflow/SKILL.md\`.
+4. **Full Reference**: Read detailed templates and NGINX config in \`.agents/skills/docker-3tier-workflow/SKILL.md\`.
 `;
 
 // สรุปกฎ Git Team Workflow สำหรับ AI
@@ -139,7 +147,7 @@ try {
       installedList.push(`[Claude Code Global]  -> ~/.claude/skills/docker-3tier-workflow`);
     }
     if (installGit && fs.existsSync(gitSkillSrc)) {
-      copyDirSync(gitSkillSrc, path.join(agyGlobal, 'git-team-workflow'));
+      copyDirSync(gitSkillSrc, path.join(claudeGlobal, 'git-team-workflow'));
       installedList.push(`[Claude Code Global]  -> ~/.claude/skills/git-team-workflow`);
     }
 
@@ -195,7 +203,7 @@ try {
       const cursorMdcDir = path.join(cwd, '.cursor', 'rules');
       fs.mkdirSync(cursorMdcDir, { recursive: true });
       if (installDocker) {
-        fs.writeFileSync(path.join(cursorMdcDir, 'docker-3tier.mdc'), `---\ndescription: Docker 3-Tier Workflow\nglobs: "**/Dockerfile*,**/compose*.yaml,**/docker-compose*.yml"\n---\n${dockerRuleSummary}`, 'utf8');
+        fs.writeFileSync(path.join(cursorMdcDir, 'docker-3tier.mdc'), `---\ndescription: Docker Full-Stack & Production Architecture\nglobs: "**/Dockerfile*,**/compose*.yaml,**/docker-compose*.yml,**/nginx*.conf"\n---\n${dockerRuleSummary}`, 'utf8');
       }
       if (installGit) {
         fs.writeFileSync(path.join(cursorMdcDir, 'git-team-workflow.mdc'), `---\ndescription: Git Team Workflow for Collaboration\nglobs: "**/*"\n---\n${gitRuleSummary}`, 'utf8');
