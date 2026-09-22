@@ -1,6 +1,6 @@
 ---
 name: docker-3tier-workflow
-description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ Full-Stack (Frontend, Backend, Database) พร้อม NGINX Gateway, Log Rotation, Auto-Restart และระบบสำรองข้อมูลระดับ Production สมบูรณ์แบบ 100%
+description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ Full-Stack (Frontend, Backend, Database) พร้อม NGINX Gateway, Log Rotation, Auto-Restart, Firewall (UFW) และระบบสำรองข้อมูลระดับ Production สมบูรณ์แบบ 100%
 ---
 
 # 🐳 Docker Full-Stack & Production Architecture Skill (ฉบับองค์กรสมบูรณ์ 100%)
@@ -200,12 +200,27 @@ find ./backups -type f -name "*.sql.gz" -mtime +7 -delete
 
 ---
 
-## 🛡️ 5. กฎเหล็ก 4 ข้อระดับ Production (Enterprise Golden Rules)
+### 📄 4.4 การตั้งค่าไฟร์วอลล์เครื่องเซิร์ฟเวอร์ (Host Firewall / UFW Checklist)
+
+```bash
+# บน Ubuntu Server ให้เปิดเฉพาะพอร์ตที่จำเป็นเท่านั้น:
+sudo ufw default deny incoming       # ปิดทุกพอร์ตขาเข้า ป้องกันการสแกนหาช่องโหว่
+sudo ufw default allow outgoing      # ยอมให้เครื่องเซิร์ฟเวอร์ต่อเน็ตออกไปดาวน์โหลดของได้
+sudo ufw allow 22/tcp                # 🔑 เปิดให้ Admin รีโมทเข้าเครื่องผ่าน SSH
+sudo ufw allow 80/tcp                # 🌐 เปิดให้คนเข้าเว็บทั่วไป (HTTP) ผ่าน NGINX
+sudo ufw allow 443/tcp               # 🔒 เปิดให้คนเข้าเว็บปลอดภัย (HTTPS) ผ่าน NGINX
+sudo ufw enable                      # สั่งเปิดใช้งานรั้วกำแพงทันที (พิมพ์ y แล้ว Enter)
+```
+
+---
+
+## 🛡️ 5. กฎเหล็ก 5 ข้อระดับ Production (Enterprise Golden Rules)
 
 1. **🔒 ห้ามเปิดพอร์ต DB และ Backend ออกสู่อินเทอร์เน็ตตรงๆ:** ต้องผ่าน NGINX Gateway เสมอ
 2. **🧹 ต้องมี Log Rotation เสมอ (`max-size: 10m`):** ป้องกันไม่ให้ไฟล์ล็อกแอบสูบพื้นที่ 264 GB บนเซิร์ฟเวอร์จนเต็ม
 3. **🔄 ใส่ `restart: unless-stopped` ทุกตู้:** เมื่อเครื่องเซิร์ฟเวอร์รีสตาร์ท ทุกตู้ต้องฟื้นขึ้นมาทำงานต่อทันที
 4. **🇹🇭 ฐานข้อมูลต้องใช้ `utf8mb4` เสมอ:** ข้อมูลภาษาไทยต้องไม่แสดงผลเป็น `???`
+5. **🧱 เปิด Firewall เฉพาะพอร์ตจำเป็น:** บนเครื่องเซิร์ฟเวอร์ (Ubuntu UFW) เปิดเฉพาะพอร์ต 22 (SSH), 80 (HTTP), 443 (HTTPS) เท่านั้น เพื่อป้องกันไม่ให้ผู้ไม่ประสงค์ดีแฮกผ่านพอร์ตอื่น
 
 ---
 
@@ -240,3 +255,5 @@ find ./backups -type f -name "*.sql.gz" -mtime +7 -delete
 ### 🚀 หมวดที่ 3: เตรียมขึ้นเซิร์ฟเวอร์จริง (Deploy to Server)
 * **3.1 เตรียมไฟล์พร้อมรันบน Ubuntu Server:**
   > "โปรเจกต์นี้กำลังจะนำไป Deploy บน Ubuntu Server ช่วยตรวจเช็ค compose.yaml, .dockerignore และ .env.example ให้พร้อมรันด้วย docker compose up -d --build ในคำสั่งเดียวให้หน่อย"
+* **3.2 ตั้งค่า Firewall (UFW) บน Ubuntu:**
+  > "ช่วยเขียนคำสั่งตั้งค่าไฟร์วอลล์ ufw บน Ubuntu ให้เปิดเฉพาะพอร์ต 22, 80, 443 ตามมาตรฐานความปลอดภัยของสกิล docker-3tier-workflow ให้หน่อย"
