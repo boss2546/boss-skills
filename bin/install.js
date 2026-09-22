@@ -12,15 +12,18 @@ const installDocker = !args.includes('--git-only') && !args.includes('--prod-onl
 const installProd = !args.includes('--git-only') && !args.includes('--docker-only');
 const installGit = !args.includes('--docker-only') && !args.includes('--prod-only');
 
-// ตัวเลือกคัดกรอง AI
+// ตัวเลือกคัดกรอง AI (ถ้าไม่ระบุ AI ใดๆ เจาะจง ให้ติดตั้งครบทุก AI)
+const aiFlags = ['--antigravity', '--gemini', '--claude', '--cursor', '--copilot', '--codex', '--windsurf', '--cline', '--roo', '--aider', '--all'];
+const hasAiFilter = args.some(a => aiFlags.includes(a));
+
 const targetAIs = {
-  antigravity: args.length === 0 || args.includes('--all') || args.includes('--antigravity') || args.includes('--gemini') || isGlobal,
-  claude: args.length === 0 || args.includes('--all') || args.includes('--claude') || isGlobal,
-  cursor: args.length === 0 || args.includes('--all') || args.includes('--cursor') || isGlobal,
-  copilot: args.length === 0 || args.includes('--all') || args.includes('--copilot') || args.includes('--codex'),
-  windsurf: args.length === 0 || args.includes('--all') || args.includes('--windsurf'),
-  cline: args.length === 0 || args.includes('--all') || args.includes('--cline') || args.includes('--roo'),
-  aider: args.length === 0 || args.includes('--all') || args.includes('--aider')
+  antigravity: !hasAiFilter || args.includes('--all') || args.includes('--antigravity') || args.includes('--gemini') || isGlobal,
+  claude: !hasAiFilter || args.includes('--all') || args.includes('--claude') || isGlobal,
+  cursor: !hasAiFilter || args.includes('--all') || args.includes('--cursor') || isGlobal,
+  copilot: !hasAiFilter || args.includes('--all') || args.includes('--copilot') || args.includes('--codex'),
+  windsurf: !hasAiFilter || args.includes('--all') || args.includes('--windsurf'),
+  cline: !hasAiFilter || args.includes('--all') || args.includes('--cline') || args.includes('--roo'),
+  aider: !hasAiFilter || args.includes('--all') || args.includes('--aider')
 };
 
 console.log('\n👑 ========================================================================');
