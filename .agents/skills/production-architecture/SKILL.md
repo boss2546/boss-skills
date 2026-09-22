@@ -1,32 +1,32 @@
 ---
-name: docker-3tier-workflow
-description: มาตรฐานการสร้าง จัดการ และแก้ปัญหาโปรเจกต์เว็บ Full-Stack (Frontend, Backend, Database) พร้อม NGINX Gateway, Log Rotation, Auto-Restart, Firewall (UFW), Cloudflare และ Custom Domain ระดับ Production สมบูรณ์แบบ 100%
+name: production-architecture
+description: มาตรฐานการยกระดับโปรเจกต์เว็บ Full-Stack สู่ Production ระดับองค์กรสมบูรณ์ 100% พร้อม NGINX Gateway, Log Rotation, Auto-Restart, Firewall (UFW), Cloudflare และ Custom Domain สากล
 ---
 
-# 🐳 Docker Full-Stack & Production Architecture Skill (ฉบับองค์กรสมบูรณ์ 100%)
+# 🏭 Enterprise Production Architecture Skill (ฉบับองค์กรสมบูรณ์ 100%)
 
-คู่มือมาตรฐานระดับสากลสำหรับ AI ในการร่วมงานกับผู้ใช้เพื่อสร้าง ออกแบบ ดูแล และ Deploy ระบบ Full-Stack ด้วย Docker ตั้งแต่ระดับพัฒนา (Development) จนถึงระดับใช้งานจริงในองค์กร (Production)
+คู่มือมาตรฐานระดับสากลสำหรับ AI ในการร่วมงานกับผู้ใช้เพื่อออกแบบ ยกระดับความปลอดภัย และ Deploy ระบบ Full-Stack ด้วย Docker สู่ระดับใช้งานจริงในองค์กร (Production) อย่างมีเสถียรภาพสูงสุด
 
 ---
 
-## 🎯 1. สถาปัตยกรรมหลัก: ร้านอาหารโมเดล + ด่านหน้า NGINX
+## 🎯 1. สถาปัตยกรรมหลัก: สถาปัตยกรรม 4 ชั้น + NGINX Gateway ด่านหน้า
 
-ในการสร้างระบบระดับมืออาชีพ ให้ยึดโครงสร้าง **4 บทบาทหลัก** เสมอ (ห้ามยัดรวมในตู้เดียวเด็ดขาด):
+ในการนำระบบขึ้นสู่ Production ให้ยึดโครงสร้าง **4 บทบาทหลัก** เสมอ (ปิดพอร์ตภายในมิดชิด ห้ามเปิดให้คนภายนอกเข้าถึงตรงๆ):
 
-| ตู้ / Service | บทบาทในร้านอาหาร | หน้าที่ในระบบจริง | พอร์ตภายนอก (Dev) | พอร์ตภายนอก (Production) |
-| :--- | :--- | :--- | :--- | :--- |
-| **🛡️ 0. NGINX Gateway** | **รปภ. & พนักงานต้อนรับหน้าประตู** | รับแขกหน้าสุด ตรวจความปลอดภัย (HTTPS/SSL), บีบอัดข้อมูล, และกระจายคนเข้าถูกห้อง | *(ไม่จำเป็นต้องเปิดใน Dev)* | `80` (HTTP) และ `443` (HTTPS) |
-| **🎨 1. Frontend** | **หน้าร้าน & เล่มเมนูอาหาร** | หน้าจอเว็บ UI ปุ่มกด ฟอร์มกรอกข้อมูล (Next.js, React, Vue, Vite, HTML/CSS) | `3000` | ปิดพอร์ตภายนอก (ให้ NGINX คุยข้างใน) |
-| **🧠 2. Backend API** | **ห้องครัว & พ่อครัวปรุงอาหาร** | ตรรกะ คิดคำนวณ ตรวจสิทธิ์ และสั่งบันทึกข้อมูล (Python FastAPI, Node.js, Go) | `3001` | ปิดพอร์ตภายนอก (ให้ NGINX คุยข้างใน) |
-| **🗄️ 3. Database** | **ตู้เย็นแช่ของ & โกดังวัตถุดิบ** | จัดเก็บข้อมูลถาวรลงฮาร์ดดิสก์ ปิดเครื่องข้อมูลไม่หาย (MySQL 8.4, PostgreSQL) | `3307` | ปิดพอร์ตภายนอก หรือเปิดเฉพาะให้ Admin |
-| **💾 4. DB Backup (เสริม)** | **ตู้เซฟสำรองฉุกเฉิน** | แอบดัมป์ข้อมูลฐานข้อมูลเก็บไว้ทุกเที่ยงคืน ย้อนหลัง 7 วัน ป้องกันข้อมูลสูญหาย | — | รันทำงานเบื้องหลังอัตโนมัติ |
+| ตู้ / Service | บทบาทในร้านอาหาร | หน้าที่ในระบบจริง | พอร์ตภายนอก (Production) |
+| :--- | :--- | :--- | :--- |
+| **🛡️ 0. NGINX Gateway** | **รปภ. & พนักงานต้อนรับหน้าประตู** | รับแขกหน้าสุด ตรวจความปลอดภัย (HTTPS/SSL), บีบอัดข้อมูล, และกระจายคนเข้าถูกห้อง | `80` (HTTP) และ `443` (HTTPS) |
+| **🎨 1. Frontend** | **หน้าร้าน & เล่มเมนูอาหาร** | หน้าจอเว็บ UI ปุ่มกด ฟอร์มกรอกข้อมูล (Next.js, React, Vue, Vite, HTML/CSS) | ปิดพอร์ตภายนอก (ให้ NGINX คุยข้างในผ่านพอร์ต 3000) |
+| **🧠 2. Backend API** | **ห้องครัว & พ่อครัวปรุงอาหาร** | ตรรกะ คิดคำนวณ ตรวจสิทธิ์ และสั่งบันทึกข้อมูล (Python FastAPI, Node.js, Go) | ปิดพอร์ตภายนอก (ให้ NGINX คุยข้างในผ่านพอร์ต 3000) |
+| **🗄️ 3. Database** | **ตู้เย็นแช่ของ & โกดังวัตถุดิบ** | จัดเก็บข้อมูลถาวรลงฮาร์ดดิสก์ ปิดเครื่องข้อมูลไม่หาย (MySQL 8.4, PostgreSQL) | `127.0.0.1:3307:3306` (เฉพาะภายในโฮสต์) |
+| **💾 4. DB Backup (เสริม)** | **ตู้เซฟสำรองฉุกเฉิน** | แอบดัมป์ข้อมูลฐานข้อมูลเก็บไว้ทุกเที่ยงคืน ย้อนหลัง 7 วัน ป้องกันข้อมูลสูญหาย | รันทำงานเบื้องหลังอัตโนมัติ |
 
 ---
 
 ## 🔄 2. กลไกการไหลของข้อมูลระดับ Production (Reverse Proxy Data Flow)
 
 ```text
- 👤 ผู้ใช้งานทั่วโลก (เปิดเว็บ https://boss-system.com)
+ 👤 ผู้ใช้งานทั่วโลก (เปิดเว็บ https://your-domain.com)
       │
       ▼
  ☁️ [ Cloudflare Edge & CDN ] ── กรองบอท/DDoS, ซ่อน IP จริง, ทำ HTTPS กุญแจเขียวอัตโนมัติ
@@ -118,10 +118,10 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-secret123}
     depends_on:
       db:
-        condition: service_healthy   # ⏱️ รอจนกว่า MySQL จะวอร์มเครื่องเสร็จ 100%
+        condition: service_healthy
     logging: *default-logging
 
-  # 🗄️ 3. Database (MySQL 8.4)
+  # 🗄️ 3. Database
   db:
     image: mysql:8.4
     container_name: app_db
@@ -131,7 +131,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret123}
       MYSQL_DATABASE: ${DB_NAME:-mydb}
     ports:
-      - "127.0.0.1:3307:3306" # ล็อกให้ต่อได้เฉพาะจากในเครื่องเซิร์ฟเวอร์เท่านั้น
+      - "127.0.0.1:3307:3306" # ป้องกันแฮกเกอร์: เข้าถึงได้เฉพาะคนในเครื่องเซิร์ฟเวอร์เท่านั้น
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -178,6 +178,7 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header CF-Connecting-IP $http_cf_connecting_ip; # IP ลูกค้าจริงจาก Cloudflare
         }
 
         # คำสั่งอื่นๆ ส่งไปหาตู้หน้าบ้าน Frontend
@@ -187,6 +188,7 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header CF-Connecting-IP $http_cf_connecting_ip; # IP ลูกค้าจริงจาก Cloudflare
         }
     }
 }
@@ -220,17 +222,20 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 
 ---
 
-### 📄 4.5 การเชื่อมต่อ Cloudflare & ชื่อโดเมน (Internet Exposure & Cloudflare Guide)
+### 📄 4.5 การเชื่อมต่อ Cloudflare & ชื่อโดเมนมาตรฐานสากล (Universal Cloudflare Standard)
 
-เมื่อต้องการเปิดให้คนทั้งโลกเข้าใช้งานผ่านชื่อโดเมนของตนเอง (เช่น `https://boss-system.com`):
+เมื่อต้องการเปิดให้คนทั้งโลกเข้าใช้งานผ่านชื่อโดเมนของตนเอง:
 
 #### 🌐 ทางเลือกที่ 1: ชี้ DNS ตรงผ่าน Cloudflare (สำหรับเซิร์ฟเวอร์ที่มี Public IP)
-1. จดชื่อโดเมน (Domain Name) จากผู้ให้บริการ (เช่น Namecheap, GoDaddy, Cloudflare Registrar)
+1. จดชื่อโดเมน (Domain Name) จากผู้ให้บริการใดๆ ในโลก
 2. นำโดเมนไปผูกกับ Cloudflare (ใช้งานฟรี) โดยเปลี่ยน Nameservers ตามที่ Cloudflare แนะนำ
 3. สร้าง **DNS Records (A Record)**:
    * **Type:** `A` | **Name:** `@` (หรือ `www`) | **IPv4 address:** `[IP เซิร์ฟเวอร์จริงของคุณ]`
-   * **Proxy status:** **เปิดเป็น "Proxied (ก้อนเมฆสีส้ม ☁️)" เสมอ** เพื่อซ่อน IP เซิร์ฟเวอร์จริง ป้องกัน DDoS และรับ HTTPS กุญแจเขียวฟรี
-4. ในไฟล์ `nginx/nginx.conf` ให้ตั้งค่า `server_name boss-system.com;`
+   * **Proxy status:** **เปิดเป็น "Proxied (ก้อนเมฆสีส้ม 🟠)" เสมอ** เพื่อซ่อน IP เซิร์ฟเวอร์จริง ป้องกัน DDoS และรับ HTTPS กุญแจเขียวฟรี
+4. **การตั้งค่า SSL/TLS ป้องกันบั๊ก (Universal SSL Standard):**
+   * ในเมนู **SSL/TLS ➔ Overview**: ให้เลือกโหมด **"Full"** (หรือ "Full (strict)") เสมอ **ห้ามใช้ Flexible** เพื่อป้องกันข้อผิดพลาดหน้าเว็บหมุนวนไม่รู้จบ (`ERR_TOO_MANY_REDIRECTS`)
+   * ในเมนู **SSL/TLS ➔ Edge Certificates**: เปิดสวิตช์ **"Always Use HTTPS"** เป็น ON
+5. ในไฟล์ `nginx/nginx.conf` ให้ตั้งค่า `server_name` ให้ตรงกับโดเมน และส่งต่อ Header `CF-Connecting-IP` เพื่อให้ Backend รู้ IP ลูกค้าจริง
 
 #### 🚇 ทางเลือกที่ 2: ใช้ Cloudflare Tunnel (สำหรับเซิร์ฟเวอร์ที่ไม่มี Public IP / อยู่หลังเราเตอร์)
 ไม่ต้องขอ Public IP ไม่ต้องเปิดพอร์ตเราเตอร์ เพียงเพิ่มตู้ `cloudflared` เข้าไปใน `compose.yaml`:
@@ -281,7 +286,7 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 
 ### 🌟 หมวดที่ 1: ยกระดับระบบสู่ Production (Enterprise Upgrade)
 * **1.1 เพิ่ม NGINX Gateway ด่านหน้า:**
-  > "ช่วยเพิ่มตู้ NGINX Gateway รับพอร์ต 80/443 และสร้างไฟล์ nginx/nginx.conf เพื่อเชื่อมต่อ Frontend และ Backend ตามมาตรฐานสกิล docker-3tier-workflow ให้หน่อย"
+  > "ช่วยเพิ่มตู้ NGINX Gateway รับพอร์ต 80/443 และสร้างไฟล์ nginx/nginx.conf เพื่อเชื่อมต่อ Frontend และ Backend ตามมาตรฐานสกิล production-architecture ให้หน่อย"
 * **1.2 ตั้งค่าระบบป้องกันดิสก์เต็มและ Auto-Restart:**
   > "ช่วยปรับ compose.yaml ในโปรเจกต์นี้ให้มี Log Rotation (10MB/3files) และตั้งค่า restart: unless-stopped ให้ครบทุกตู้ตามมาตรฐาน Production ให้หน่อย"
 
@@ -295,7 +300,7 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 * **3.1 เตรียมไฟล์พร้อมรันบน Ubuntu Server:**
   > "โปรเจกต์นี้กำลังจะนำไป Deploy บน Ubuntu Server ช่วยตรวจเช็ค compose.yaml, .dockerignore และ .env.example ให้พร้อมรันด้วย docker compose up -d --build ในคำสั่งเดียวให้หน่อย"
 * **3.2 ตั้งค่า Firewall (UFW) บน Ubuntu:**
-  > "ช่วยเขียนคำสั่งตั้งค่าไฟร์วอลล์ ufw บน Ubuntu ให้เปิดเฉพาะพอร์ต 22, 80, 443 ตามมาตรฐานความปลอดภัยของสกิล docker-3tier-workflow ให้หน่อย"
+  > "ช่วยเขียนคำสั่งตั้งค่าไฟร์วอลล์ ufw บน Ubuntu ให้เปิดเฉพาะพอร์ต 22, 80, 443 ตามมาตรฐานความปลอดภัยของสกิล production-architecture ให้หน่อย"
 
 ### 🌐 หมวดที่ 4: เชื่อมต่อ Cloudflare และชื่อโดเมน (Domain & Cloudflare)
 * **4.1 แนะนำการผูกโดเมนเข้ากับ Cloudflare:**

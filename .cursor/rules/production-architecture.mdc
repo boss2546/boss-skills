@@ -1,0 +1,28 @@
+---
+description: Enterprise Production Architecture
+globs: "**/compose*.prod*,**/nginx*.conf,**/*production*"
+---
+
+## 🏭 Enterprise Production Architecture Standards (Universal AI Guide)
+When deploying or upgrading Docker environments to Production:
+1. **4-Tier Architecture Pattern**:
+   - **Gateway (NGINX)**: Port `80:80` & `443:443` — Entry point, SSL termination, Reverse Proxy.
+   - **Frontend**: Internal port `3000` — closed to the outside, reverse proxied by NGINX.
+   - **Backend API**: Internal port `3000` — closed to the outside, reverse proxied by NGINX.
+   - **Database**: Port `127.0.0.1:3307:3306` (MySQL 8.4+ / PostgreSQL) with `utf8mb4` Thai charset.
+2. **Production Reliability Standards**:
+   - **Auto-Restart**: All services MUST have `restart: unless-stopped`.
+   - **Disk Full Prevention (Log Rotation)**: All containers MUST have:
+     ```yaml
+     logging:
+       driver: "json-file"
+       options:
+         max-size: "10m"
+         max-file: "3"
+     ```
+   - **Dynamic RAM**: Containers share host RAM dynamically without hard ceilings, preventing OOM crash (Exit Code 137).
+   - **Host Firewall (UFW)**: Allow only ports 22 (SSH), 80 (HTTP), 443 (HTTPS); deny all other incoming.
+   - **Cloudflare & Domain**: Protect server with Cloudflare Proxied (Orange Cloud 🟠) or Cloudflare Tunnel, set SSL mode to "Full".
+   - **Proxy Headers**: NGINX / Backend forward `Host`, `X-Real-IP`, `X-Forwarded-For`, `CF-Connecting-IP`.
+   - **Auto DB Backup**: Rolling 7-day automated database dump scripts.
+3. **Full Reference**: Read detailed templates in `.agents/skills/production-architecture/SKILL.md`.

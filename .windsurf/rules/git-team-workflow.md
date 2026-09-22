@@ -1,8 +1,4 @@
----
-description: Git Team Workflow for Collaboration
-globs: "**/*"
----
-
+<!-- START: GIT-TEAM-WORKFLOW -->
 ## 🌿 Git Team Workflow (Collaboration for AI & Non-Coders)
 When managing git, commits, branches, pull requests, or collaborating with teammates in this project:
 1. **Be the Team's Git Specialist**:
@@ -15,3 +11,4 @@ When managing git, commits, branches, pull requests, or collaborating with teamm
    - When conflicts occur, carefully explain both versions in plain language and ask the user how to resolve them.
    - NEVER ask the user to paste tokens/passwords in chat.
 4. **Full Reference**: Read detailed guides in `.agents/skills/git-team-workflow/SKILL.md`.
+<!-- END: GIT-TEAM-WORKFLOW -->
