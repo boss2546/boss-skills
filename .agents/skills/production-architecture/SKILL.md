@@ -9,6 +9,19 @@ description: มาตรฐานการยกระดับโปรเจ�
 
 ---
 
+## 🔗 ความต่อเนื่องและเชื่อมโยงกับ `docker-workflow` (From Dev to Production)
+
+สกิล **`production-architecture`** นี้คือ **"ขั้นที่ 2 (Phase 2)"** ที่รับไม้ต่อโดยตรงจาก **`docker-workflow` (Phase 1)**:
+* **🌱 Phase 1 (Development ด้วย `docker-workflow`):** พัฒนาโค้ด 3 ตู้ (Frontend :3000, Backend :3001, Database :3307) ในเครื่อง Mac โดยมี Live Reload แก้โค้ดสด และ Adminer (:8085) ดูตารางผ่านเว็บ อำนวยความสะดวกให้เขียนโค้ดได้คล่องตัว
+* **🏭 Phase 2 (Production ด้วย `production-architecture`):** เมื่อทดสอบในเครื่องเสร็จสมบูรณ์ 100% และพร้อมนำขึ้นเซิร์ฟเวอร์จริง (VPS / Cloud เช่น Ubuntu) หรือผูกกับชื่อโดเมน (เช่น `meuu.live`) ให้ใช้สกิลนี้เพื่อ **"สวมเกราะป้องกันระดับองค์กร"**:
+  1. เพิ่ม **NGINX Gateway (Tier 0)** ทำหน้าที่เป็น Reverse Proxy รับแขกหน้าสุดที่พอร์ต 80 และ 443
+  2. ปิดพอร์ต 3000 และ 3001 ภายในมิดชิด ผู้ใช้ภายนอกเข้าผ่าน NGINX เท่านั้น
+  3. ถอด Live Reload Bind Mounts ออกเพื่อใช้ Container Image ถาวรที่มีความนิ่ง เสถียร และปลอดภัยสูงสุด
+  4. เพิ่ม Log Rotation (10MB x 3), Auto-Restart, Dynamic RAM, UFW Firewall และ Cloudflare Proxied 🟠
+  5. ตั้งระบบ Auto Backup ฐานข้อมูลหมุนเวียน 7 วัน ป้องกันข้อมูลสูญหาย 100%
+
+---
+
 ## 🎯 1. สถาปัตยกรรมหลัก: สถาปัตยกรรม 4 ชั้น + NGINX Gateway ด่านหน้า
 
 ในการนำระบบขึ้นสู่ Production ให้ยึดโครงสร้าง **4 บทบาทหลัก** เสมอ (ปิดพอร์ตภายในมิดชิด ห้ามเปิดให้คนภายนอกเข้าถึงตรงๆ):
@@ -285,9 +298,11 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 ผู้ใช้สามารถก๊อปปี้ข้อความเหล่านี้ไปสั่ง AI ได้ทันที:
 
 ### 🌟 หมวดที่ 1: ยกระดับระบบสู่ Production (Enterprise Upgrade)
-* **1.1 เพิ่ม NGINX Gateway ด่านหน้า:**
+* **1.1 ยกระดับจาก `docker-workflow` สู่ Production (Handover):**
+  > "ฉันพัฒนาโปรเจกต์ 3 ตู้ด้วยสกิล docker-workflow ในเครื่องเสร็จสมบูรณ์แล้ว ตอนนี้พร้อมขึ้นเซิร์ฟเวอร์จริง ช่วยนำโครงสร้างและโค้ดเดิมมายกระดับขึ้น Production ตามสกิล production-architecture ให้หน่อย: ใส่ NGINX Gateway, ปิดพอร์ตตรง, ปลด Live Reload ออก, ตั้ง Log Rotation, ใส่ Auto-Restart, และแนะนำการตั้ง UFW Firewall กับ Cloudflare ให้ครบถ้วน"
+* **1.2 เพิ่ม NGINX Gateway ด่านหน้า:**
   > "ช่วยเพิ่มตู้ NGINX Gateway รับพอร์ต 80/443 และสร้างไฟล์ nginx/nginx.conf เพื่อเชื่อมต่อ Frontend และ Backend ตามมาตรฐานสกิล production-architecture ให้หน่อย"
-* **1.2 ตั้งค่าระบบป้องกันดิสก์เต็มและ Auto-Restart:**
+* **1.3 ตั้งค่าระบบป้องกันดิสก์เต็มและ Auto-Restart:**
   > "ช่วยปรับ compose.yaml ในโปรเจกต์นี้ให้มี Log Rotation (10MB/3files) และตั้งค่า restart: unless-stopped ให้ครบทุกตู้ตามมาตรฐาน Production ให้หน่อย"
 
 ### 💾 หมวดที่ 2: การสำรองข้อมูลและกู้คืน (Backup & Restore)
