@@ -23,7 +23,7 @@ const targetAIs = {
 };
 
 console.log('\n👑 ========================================================================');
-console.log('🚀 BOSS SKILL — Universal AI Skills Installer (คำสั่งเดียว ได้ครบทุก AI)');
+console.log('🚀 BOSS AI — Universal Skills Installer (คำสั่งเดียว ได้ครบทุก AI)');
 console.log('========================================================================');
 console.log(`📦 สกิล: ${[installDocker ? '🐳 Docker 3-Tier Workflow' : '', installGit ? '🌿 Git Team Workflow' : ''].filter(Boolean).join(' + ')}`);
 console.log(`🎯 โหมด: ${isGlobal ? '🌐 Global (ติดตั้งเข้าแกนกลางของเครื่อง Mac ใช้งานได้ทุกโปรเจกต์)' : '📁 Project Workspace (ติดตั้งเข้าโปรเจกต์ปัจจุบัน)'}`);
@@ -139,7 +139,7 @@ try {
       installedList.push(`[Claude Code Global]  -> ~/.claude/skills/docker-3tier-workflow`);
     }
     if (installGit && fs.existsSync(gitSkillSrc)) {
-      copyDirSync(gitSkillSrc, path.join(claudeGlobal, 'git-team-workflow'));
+      copyDirSync(gitSkillSrc, path.join(agyGlobal, 'git-team-workflow'));
       installedList.push(`[Claude Code Global]  -> ~/.claude/skills/git-team-workflow`);
     }
 
@@ -242,7 +242,7 @@ try {
   }
 
   console.log('------------------------------------------------------------------------');
-  console.log('🎉 BOSS SKILL ติดตั้งและซิงก์ชุดสกิลให้เรียบร้อยแล้ว:');
+  console.log('🎉 BOSS AI ติดตั้งและซิงก์ชุดสกิลให้เรียบร้อยแล้ว:');
   console.log('------------------------------------------------------------------------');
   installedList.forEach(item => console.log(`  ✓ ${item}`));
   console.log('========================================================================');

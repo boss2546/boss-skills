@@ -1,4 +1,4 @@
-# 👑 BOSS SKILL — Universal AI Skills Installer
+# 👑 BOSS AI — Universal Skills Installer
 
 แพ็กเกจติดตั้งชุดสกิลมาตรฐานสำหรับนักพัฒนาและสาย Vibe Coding: **`Docker 3-Tier Workflow`** + **`Git Team Workflow`** ให้กับ **AI Assistants ทุกตัวในโลก** ในคำสั่งเดียว
 
@@ -9,13 +9,13 @@
 ### 1. ใช้งานในโปรเจกต์ปัจจุบัน (Project Workspace)
 เปิด Terminal ในโฟลเดอร์โปรเจกต์ของคุณ แล้วพิมพ์:
 ```bash
-npx boss-skill
+npx boss-ai
 ```
 *(เพียง 1 วินาที AI ทุกตัวในโฟลเดอร์นั้นจะรู้จักและทำตามมาตรฐานทันที)*
 
 ### 2. ใช้งานเข้าแกนกลางของเครื่อง Mac (Global Mode)
 ```bash
-npx boss-skill --global
+npx boss-ai --global
 ```
 *(Claude Code, Antigravity และ Cursor ในเครื่องนี้จะพกทั้ง 2 สกิลติดตัวไปทุกโฟลเดอร์ตลอดกาล)*
 
@@ -62,7 +62,7 @@ npx boss-skill --global
 
 ในเครื่องของคุณได้เชื่อมต่อคำสั่งทางลัดไว้แล้ว สามารถเปิด Terminal แล้วพิมพ์สั้นๆ ได้เลย:
 ```bash
-boss-skill
+boss-ai
 # หรือพิมพ์แค่
 boss
 ```
@@ -73,12 +73,10 @@ boss
 
 ### ทางที่ 1: ผ่าน npmjs.com
 ```bash
-npm publish
+npx boss-ai
 ```
-*(หลังจากนั้นทุกคนในโลกจะสั่ง `npx boss-skill` ได้ทันที)*
 
-### ทางที่ 2: ผ่าน GitHub (ไม่ต้องมีบัญชี npm)
-Push โฟลเดอร์นี้ขึ้น GitHub ของคุณ แล้วเรียกใช้ได้ทันที:
+### ทางที่ 2: ผ่าน GitHub
 ```bash
-npx github:boss2546/boss-ai
+npx github:boss2546/boss-skills
 ```
