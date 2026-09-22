@@ -36,7 +36,7 @@ description: มาตรฐานการสร้าง จัดการ �
                                                 ▼ (สั่งงานผ่าน Network ภายใน)
                                           🗄️ Database Container (MySQL 3306 ภายใน)
                                                 ▲
-                                                │ (แอบสำรองข้อมูลทุกคืน)
+                                                │ (แอบสำรองข้อมูลทุกคืน หมุนเวียนลบของเก่าเกิน 7 วัน)
                                           💾 Backup Service (เก็บย้อนหลัง 7 วัน)
 ```
 
@@ -58,14 +58,14 @@ my-project/
 ├── backend/                  # ตู้หลังบ้าน
 │   ├── Dockerfile
 │   └── (source code)
-└── backups/                  # โฟลเดอร์เก็บไฟล์สำรองฐานข้อมูลอัตโนมัติ
+└── backups/                  # โฟลเดอร์เก็บไฟล์สำรองฐานข้อมูลอัตโนมัติ (ลบของเก่าเกิน 7 วันอัตโนมัติ)
 ```
 
 ---
 
 ## 📋 4. แม่แบบไฟล์มาตรฐานระดับ Production (The Golden Templates)
 
-### 📄 4.1 แม่แบบ `compose.yaml` ระดับ Production (ครบ 5 เสาหลัก)
+### 📄 4.1 แม่แบบ `compose.yaml` ระดับ Production (พร้อม NGINX, Log Rotation และ Auto-Restart)
 
 ```yaml
 services:
@@ -95,10 +95,6 @@ services:
     restart: unless-stopped
     expose:
       - "3000"                # เปิดให้เฉพาะ NGINX คุยข้างใน ไม่เปิดออกนอกเครื่อง
-    deploy:
-      resources:
-        limits:
-          memory: 512M        # 🎛️ ล็อกเพดาน RAM สูงสุด 512MB
     logging: *default-logging
 
   # 🧠 2. Backend API
@@ -117,10 +113,6 @@ services:
     depends_on:
       db:
         condition: service_healthy   # ⏱️ รอจนกว่า MySQL จะวอร์มเครื่องเสร็จ 100%
-    deploy:
-      resources:
-        limits:
-          memory: 1G          # 🎛️ ล็อกเพดาน RAM ไม่เกิน 1GB
     logging: *default-logging
 
   # 🗄️ 3. Database (MySQL 8.4)
@@ -141,10 +133,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    deploy:
-      resources:
-        limits:
-          memory: 2G
     logging: *default-logging
 
 volumes:
@@ -200,20 +188,30 @@ http {
 
 ---
 
-## 🛡️ 5. กฎเหล็ก 5 ข้อระดับ Production (Enterprise Golden Rules)
+### 📄 4.3 แม่แบบคำสั่งสำรองข้อมูลอัตโนมัติ (Rolling 7-Day Backup)
+
+```bash
+# 1. ดัมป์ฐานข้อมูลแล้วบีบอัดเป็น .gz (ประหยัดพื้นที่ดิสก์)
+docker exec app_db mysqldump -u root -psecret123 mydb | gzip > ./backups/db_$(date +%F_%H%M%S).sql.gz
+
+# 2. 🧹 ลบไฟล์สำรองที่เก่ากว่า 7 วันอัตโนมัติ (ดิสก์ไม่มีวันเต็ม)
+find ./backups -type f -name "*.sql.gz" -mtime +7 -delete
+```
+
+---
+
+## 🛡️ 5. กฎเหล็ก 4 ข้อระดับ Production (Enterprise Golden Rules)
 
 1. **🔒 ห้ามเปิดพอร์ต DB และ Backend ออกสู่อินเทอร์เน็ตตรงๆ:** ต้องผ่าน NGINX Gateway เสมอ
 2. **🧹 ต้องมี Log Rotation เสมอ (`max-size: 10m`):** ป้องกันไม่ให้ไฟล์ล็อกแอบสูบพื้นที่ 264 GB บนเซิร์ฟเวอร์จนเต็ม
 3. **🔄 ใส่ `restart: unless-stopped` ทุกตู้:** เมื่อเครื่องเซิร์ฟเวอร์รีสตาร์ท ทุกตู้ต้องฟื้นขึ้นมาทำงานต่อทันที
 4. **🇹🇭 ฐานข้อมูลต้องใช้ `utf8mb4` เสมอ:** ข้อมูลภาษาไทยต้องไม่แสดงผลเป็น `???`
-5. **🎛️ กำหนด Resource Limits:** ล็อกเพดาน RAM ของแต่ละตู้ เพื่อไม่ให้ตู้ใดตู้หนึ่งเกิด Memory Leak แล้วดึง RAM ของเครื่องแม่ข่ายจนค้าง
 
 ---
 
 ## 🔍 6. คู่มือแก้ปัญหาด่วนระดับ Production (Enterprise Troubleshooting)
 
 * **502 Bad Gateway จาก NGINX:** ตู้ข้างใน (Frontend หรือ Backend) กำลังดับ หรือยังสตาร์ทไม่เสร็จ ให้สั่ง `docker logs app_backend` ดูสาเหตุ
-* **Error OOM (Out Of Memory / Exit 137):** ตู้กิน RAM ทะลุเพดานที่ล็อกไว้ ให้ขยับ `limits: memory` ใน `compose.yaml` เพิ่มขึ้น
 * **ฮาร์ดดิสก์เซิร์ฟเวอร์เต็ม (`No space left on device`):** สั่งรันคำสั่งล้างภาพและ Cache ขยะ:
   ```bash
   docker system prune -a --volumes=false
@@ -231,13 +229,13 @@ http {
 * **1.1 เพิ่ม NGINX Gateway ด่านหน้า:**
   > "ช่วยเพิ่มตู้ NGINX Gateway รับพอร์ต 80/443 และสร้างไฟล์ nginx/nginx.conf เพื่อเชื่อมต่อ Frontend และ Backend ตามมาตรฐานสกิล docker-3tier-workflow ให้หน่อย"
 * **1.2 ตั้งค่าระบบป้องกันดิสก์เต็มและ Auto-Restart:**
-  > "ช่วยปรับ compose.yaml ในโปรเจกต์นี้ให้มี Log Rotation (10MB/3files) และตั้งค่า restart: unless-stopped พร้อมล็อกเพดาน RAM ให้ครบทุกตู้ตามมาตรฐาน Production ให้หน่อย"
+  > "ช่วยปรับ compose.yaml ในโปรเจกต์นี้ให้มี Log Rotation (10MB/3files) และตั้งค่า restart: unless-stopped ให้ครบทุกตู้ตามมาตรฐาน Production ให้หน่อย"
 
 ### 💾 หมวดที่ 2: การสำรองข้อมูลและกู้คืน (Backup & Restore)
 * **2.1 สั่ง Backup ฐานข้อมูลด่วนทันที:**
-  > "ช่วยเขียนคำสั่ง docker exec สำหรับดัมป์ข้อมูล MySQL ทั้งหมดออกมาเป็นไฟล์ .sql เก็บไว้ในโฟลเดอร์ backups/ วันนี้ทีละสเต็ปหน่อย"
+  > "ช่วยเขียนคำสั่ง docker exec สำหรับดัมป์ข้อมูล MySQL ทั้งหมดออกมาเป็นไฟล์ .sql.gz เก็บไว้ในโฟลเดอร์ backups/ พร้อมคำสั่งลบของเก่าเกิน 7 วันให้หน่อย"
 * **2.2 กู้คืนข้อมูลจากไฟล์ Backup:**
-  > "ฉันมีไฟล์สำรอง database_backup.sql ช่วยเขียนคำสั่งและวิธีนำข้อมูลนี้กลับเข้าไปใส่ในตู้ MySQL ให้หน่อย"
+  > "ฉันมีไฟล์สำรอง database_backup.sql.gz ช่วยเขียนคำสั่งและวิธีนำข้อมูลนี้กลับเข้าไปใส่ในตู้ MySQL ให้หน่อย"
 
 ### 🚀 หมวดที่ 3: เตรียมขึ้นเซิร์ฟเวอร์จริง (Deploy to Server)
 * **3.1 เตรียมไฟล์พร้อมรันบน Ubuntu Server:**
