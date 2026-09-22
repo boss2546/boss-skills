@@ -1,0 +1,20 @@
+---
+description: Docker 3-Tier Workflow
+globs: "**/Dockerfile*,**/compose*.yaml,**/docker-compose*.yml"
+---
+
+## 🐳 Docker 3-Tier Architecture Standards (Universal AI Guide)
+When designing, containerizing, or managing Docker environments in this project:
+1. **Architecture (3 Tiers)**:
+   - **Frontend**: Port `3000:3000` (Next.js / React / Vite / Vue)
+   - **Backend API**: Port `3001:3000` (Node.js / Express / Go / Python)
+   - **Database**: Port `3307:3306` (MySQL 8.4+ / PostgreSQL) with `utf8mb4` Thai charset
+2. **Docker Compose Reliability Standards**:
+   - Database MUST have a `healthcheck` configured (e.g. `mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD`).
+   - Backend MUST use `depends_on: db: condition: service_healthy` to prevent startup race conditions (`ECONNREFUSED`).
+   - Database MUST mount to a named persistent volume (`volumes: [mysql_data:/var/lib/mysql]`).
+   - Backend CORS MUST allow requests from Frontend (`http://localhost:3000`).
+   - Avoid port 3306 on host; map to 3307 or custom port to prevent collision with local MySQL.
+3. **Database Client Tools (DBeaver / DataGrip)**:
+   - For MySQL 8+, ensure `allowPublicKeyRetrieval=true` in Driver Properties.
+4. **Full Reference**: Read detailed workflow and templates in `.agents/skills/docker-3tier-workflow/SKILL.md`.
