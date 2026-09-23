@@ -160,7 +160,7 @@ volumes:
 
 ---
 
-### 📄 4.2 แม่แบบคอนฟิก `nginx/nginx.conf`
+### 📄 4.2 แม่แบบคอนฟิก `nginx/nginx.conf` (พร้อม Dynamic DNS Resolver ป้องกัน 502)
 
 ```nginx
 events { worker_connections 1024; }
@@ -172,21 +172,17 @@ http {
     # อัปโหลดไฟล์ได้สูงสุด 50MB
     client_max_body_size 50M;
 
-    upstream frontend_service {
-        server frontend:3000;
-    }
-
-    upstream backend_service {
-        server backend:3000;
-    }
+    # 🔄 Docker Internal DNS Resolver: ค้นหา IP ตู้ใหม่อัตโนมัติทุก 5 วินาที ป้องกัน 502 Bad Gateway ตอนอัปเดตตู้
+    resolver 127.0.0.11 valid=5s ipv6=off;
 
     server {
         listen 80;
         server_name localhost;
 
-        # ส่งคำสั่ง /api/ ไปหาตู้หลังบ้าน Backend
+        # ส่งคำสั่ง /api/ ไปหาตู้หลังบ้าน Backend (ใช้ตัวแปรเพื่อบังคับค้นหา IP ใหม่เสมอเมื่อตู้รีสตาร์ท)
         location /api/ {
-            proxy_pass http://backend_service/;
+            set $backend "backend:3000";
+            proxy_pass http://$backend/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -196,7 +192,8 @@ http {
 
         # คำสั่งอื่นๆ ส่งไปหาตู้หน้าบ้าน Frontend
         location / {
-            proxy_pass http://frontend_service;
+            set $frontend "frontend:3000";
+            proxy_pass http://$frontend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -270,7 +267,129 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 
 ---
 
-## 🛡️ 5. กฎเหล็ก 6 ข้อระดับ Production (Enterprise Golden Rules)
+## 🏛️ 5. สี่เสาหลักมาตรฐานความทนทานระดับองค์กร (Universal Resilience Standards)
+
+บทเรียนจากระบบจริงในระดับ Production: แม้ระบบจะคอนเทนเนอร์ไรซ์สมบูรณ์แล้ว แต่หากขาดเสาหลัก 4 ข้อนี้ ระบบจะพบปัญหาเว็บเปิดไม่ติด (Cold-start crash), หน้าเว็บขึ้น 502 ค้างตอนอัปเดตโค้ด (Stale DNS), บอทประมวลผลเบื้องหลังแอบดับเงียบ (Leaked Worker Connection), หรือข้อมูลประวัติย้อนหลังสูญหาย (In-Memory Only Data Loss):
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                    4 เสาหลักมาตรฐานความทนทานระดับองค์กร                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ 1. ⏳ Database Cold-Start Resilience ➔ ระบบต้องมี Retry ไม่ยอมแพ้ที่ครั้งแรก   │
+│ 2. 🔄 Dynamic Service Discovery      ➔ NGINX ต้องตรวจจับเบอร์ IP ใหม่อัตโนมัติ│
+│ 3. 🔌 Worker Connection Lifecycle     ➔ งานเบื้องหลังต้องเบิกท่อเชื่อมต่อใหม่เสมอ│
+│ 4. 💾 Dual-Storage Architecture       ➔ ข้อมูลสดต้องมีท่อลงฐานข้อมูลถาวรควบคู่ │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### ⏳ 5.1 มาตรฐานการรอฐานข้อมูลอย่างยืดหยุ่น (Database Cold-Start & Retry Resilience)
+* **ความจริงในระบบ Container:** ฐานข้อมูล (MySQL 8.4+, PostgreSQL) เมื่อสตาร์ทขึ้นมาใน Docker จะต้องใช้เวลาเตรียมพื้นที่ดิสก์, ตรวจสอบ InnoDB logs, และโหลดคอนฟิกเสมอ (ใช้เวลา 10–25 วินาที) ในขณะที่ตัว Backend (Python, Node.js, Go) บูตเสร็จใน 1–2 วินาที
+* **ข้อผิดพลาดทั่วไป (Anti-Pattern):** แอปพลิเคชันฝั่งหลังบ้านพยายามเชื่อมต่อฐานข้อมูลแค่ครั้งเดียวตอนเริ่มรัน พอยังต่อไม่ติดก็แครช (Crash Loop) หรือแอบดีด (Silent Fallback) ไปใช้ฐานข้อมูลจำลอง (In-Memory / SQLite ชั่วคราว) ทำให้เมื่อผู้ใช้ใช้งานจริง ข้อมูลสำคัญไม่ถูกบันทึกลงฐานข้อมูลหลัก
+* **กฎมาตรฐานสากล:**
+  > **"แอปพลิเคชันฝั่งหลังบ้านทุกภาษา ห้ามเชื่อมต่อฐานข้อมูลแบบครั้งเดียวแล้วยอมแพ้ (Fail-fast on startup) ต้องมีกลไก Retry Loop อย่างน้อย 10–15 รอบ (รอบละ 2 วินาที รวม 20–30 วินาที) เพื่อรอให้ฐานข้อมูลบูตเสร็จสมบูรณ์ และต้องตั้งค่า `healthcheck` ที่ตู้ Database เสมอ"**
+
+```python
+# 🐍 ตัวอย่าง Pattern มาตรฐานใน Python (PyMySQL / SQLAlchemy)
+max_retries = 15
+retry_delay = 2  # วินาที (รอรวมสูงสุด 30 วินาที)
+
+for attempt in range(1, max_retries + 1):
+    try:
+        conn = pymysql.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASSWORD, database=DB_NAME)
+        print(f"✅ [Database] เชื่อมต่อสำเร็จในรอบที่ {attempt}!")
+        break
+    except Exception as e:
+        if attempt < max_retries:
+            print(f"⏳ [Database] กำลังรอ MySQL บูตเสร็จ... (รอบที่ {attempt}/{max_retries})")
+            time.sleep(retry_delay)
+        else:
+            raise RuntimeError(f"❌ ฐานข้อมูลไม่พร้อมทำงานหลังรอครบ {max_retries} รอบ: {e}")
+```
+
+---
+
+### 🔄 5.2 มาตรฐานการค้นหาไอพีแบบยืดหยุ่นใน Reverse Proxy (Dynamic Service Discovery & Anti-Stale DNS)
+* **ความจริงในระบบ Container:** ใน Docker Network ทุกครั้งที่มีการอัปเดตโค้ด, สร้าง Image ใหม่ หรือสั่ง `docker compose up -d --build` Docker จะแจกหมายเลข Internal IP ให้แต่ละตู้ใหม่เสมอ
+* **ข้อผิดพลาดทั่วไป (Anti-Pattern):** NGINX ที่ทำหน้าที่เป็น Reverse Proxy โดยค่าเริ่มต้นจะจำชื่อโดเมนภายใน (เช่น `proxy_pass http://backend:3000;`) และแคชหมายเลข IP เก่าไว้ตั้งแต่ตอนสตาร์ทเครื่อง พอตู้ข้างในรีสตาร์ทและได้ IP ใหม่ NGINX จึงส่งผู้ใช้ไปหา IP ที่ไม่มีอยู่จริง เกิดข้อผิดพลาดคลาสสิกของโลกเว็บคือ **HTTP 502 Bad Gateway** ค้างยาวนาน
+* **กฎมาตรฐานสากล:**
+  > **"ในไฟล์คอนฟิก NGINX ที่รันบน Docker ต้องใส่คำสั่ง `resolver 127.0.0.11 valid=5s ipv6=off;` และส่งต่อคำขอผ่านตัวแปร (Variable Proxy) เสมอ เพื่อบังคับให้ NGINX ค้นหาหมายเลข IP ของตู้ข้างในใหม่อย่างต่อเนื่องแบบ Dynamic DNS"**
+
+```nginx
+# 🛡️ ตัวอย่าง Pattern มาตรฐานใน nginx/nginx.conf
+http {
+    # 127.0.0.11 คือ DNS ประจำตัวของ Docker Engine ภายในทุกเครื่อง
+    resolver 127.0.0.11 valid=5s ipv6=off;
+
+    server {
+        listen 80;
+
+        location /api/ {
+            set $backend "backend:3000";       # กำหนดผ่านตัวแปรเพื่อบังคับค้นหา IP ใหม่
+            proxy_pass http://$backend/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+}
+```
+
+---
+
+### 🔌 5.3 มาตรฐานวงจรชีวิตการเชื่อมต่อในงานเบื้องหลัง (Long-Running Worker Connection Lifecycle)
+* **ความจริงในระบบเว็บ:** ทุกโปรเจกต์ระดับองค์กรจะมีงาน 2 ประเภทเสมอ:
+  1. *งานรับ-ส่งหน้าเว็บ (API Request-Response):* วิ่งเข้ามา จบงาน แล้วคืนท่อ
+  2. *งานที่ทำงานวนลูปเบื้องหลังตลอดเวลา (Long-Running Worker / Daemon / Cron / Queue Consumer / Data Streamer):* เช่น บอทดึงข้อมูล, ตัวแปลงวิดีโอ, ตัวดักสัญญาณเรดาร์, ระบบส่งแจ้งเตือน
+* **ข้อผิดพลาดทั่วไป (Anti-Pattern):** ผู้พัฒนามักเปิด Connection ฐานข้อมูลค้างไว้แค่ท่อเดียวตั้งแต่สตาร์ทโปรแกรม แล้วเอาท่อเดิมนั้นไปวนลูป `while True:` ใช้ซ้ำตลอดคืน เมื่อเครือข่ายกระตุก สัญญาณขาด หรือ MySQL ตัดท่อที่ Idle เกินกำหนด (MySQL timeout) ลูปถัดไปจะพังทันทีด้วยข้อผิดพลาด `Connection closed` หรือ `OperationalError (0, '')` และทำให้ Worker นั้นแอบดับเงียบไปโดยไม่มีใครรู้
+* **กฎมาตรฐานสากล:**
+  > **"ในโปรเซสที่ทำงานวนลูปเบื้องหลัง (Background Worker) ต้องใช้รูปแบบ 'เบิก-ใช้-คืน' (Acquire-Use-Release per Cycle) โดยเปิดและปิด (หรือคืนท่อเข้า Pool) ต่อหนึ่งรอบการประมวลผลเสมอ และต้องเปิดระบบตรวจสอบความสดใหม่ของท่อ (เช่น `pool_pre_ping=True`) ห้ามถือวัตถุ Connection ค้างข้ามลูป"**
+
+```python
+# 🐍 ตัวอย่าง Pattern มาตรฐานสำหรับ Background Worker
+while is_running:
+    # 1. เบิกท่อเชื่อมต่อสดใหม่ในแต่ละรอบ (หรือใช้ Context Manager)
+    with db_pool.get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO flight_logs (icao24, altitude) VALUES (%s, %s)", (icao, alt))
+        conn.commit()
+    # 2. คืนท่อทันทีเมื่อจบรอบ ไม่ถือค้างไว้ตอน sleep
+    time.sleep(interval_seconds)
+```
+
+---
+
+### 💾 5.4 มาตรฐานสถาปัตยกรรมจัดเก็บข้อมูลแบบสองระดับ (Dual-Storage & Periodic Batch Persistence)
+* **ความจริงในระบบข้อมูลสด:** ระบบที่มีข้อมูลไหลเข้าตลอดเวลา (เช่น แชทสด, พิกัด GPS/เรดาร์, ราคาหุ้น, อุปกรณ์ IoT, Event Logs) ต้องการความเร็วในการตอบสนองหลักมิลลิวินาที จึงจำเป็นต้องเก็บข้อมูลไว้ในหน่วยความจำชั่วคราว (In-Memory / RAM / Cache / State Object) เพื่อให้หน้าจอเว็บแสดงผลได้ทันที
+* **ข้อผิดพลาดทั่วไป (Anti-Pattern):** ผู้พัฒนาโฟกัสแค่การทำให้หน้าจอแสดงผลสดได้เร็ว แต่ไม่ได้สร้างท่อบันทึกถาวรลงฐานข้อมูลหลัก (SQL Database) ทำให้เมื่อเซิร์ฟเวอร์รีสตาร์ท ประวัติข้อมูลย้อนหลังทั้งหมดจะสูญหายทันที
+* **กฎมาตรฐานสากล:**
+  > **"ทุกโมดูลที่จัดการข้อมูลแบบ Real-time ต้องออกแบบโครงสร้าง 2 ชั้น (Dual-Storage) เสมอ: ชั้นที่ 1 ส่งเข้า Memory/Cache เพื่อตอบสนองหน้าเว็บทันที และชั้นที่ 2 มีระบบทยอยบันทึกเป็นชุด (Periodic Batch Flush) ลงสู่ฐานข้อมูลถาวรเป็นจังหวะ เพื่อรักษาประวัติข้อมูลให้ครบถ้วน 100% โดยไม่หน่วงระบบ"**
+
+```text
+ 📡 ข้อมูลสด (Stream / GPS / Radar)
+      │
+      ▼
+ 💾 ชั้นที่ 1: Memory / Cache ➔ [ ส่งให้หน้าเว็บทันที ตอบสนองลื่นไหลใน 1ms ]
+      │
+      ▼ (รวบรวมข้อมูลเป็นก้อน / ทุกๆ 5-10 วินาที)
+ 🗄️ ชั้นที่ 2: Periodic Batch Flush ➔ [ บันทึกลง MySQL / Postgres ถาวร ข้อมูลไม่หาย 100% ]
+```
+
+---
+
+### 📊 5.5 สรุปตารางเปรียบเทียบมาตรฐานความทนทาน (Universal Resilience Matrix)
+
+| หัวข้อมาตรฐานสากล | ❌ สิ่งที่มักทำผิด (Anti-Pattern) | ✅ มาตรฐานที่ถูกต้อง (Universal Standard) |
+| :--- | :--- | :--- |
+| **1. ⏳ Database Startup** | ต่อ DB แค่ครั้งเดียวตอนบูต ไม่ติดก็แครช หรือแอบหนีไป SQLite | **Retry Loop 10–15 รอบ (20–30 วินาที)** + `healthcheck` รอจนกว่า DB จะพร้อม |
+| **2. 🔄 Proxy Routing** | NGINX ชี้ `proxy_pass` หาชื่อตรงๆ IP ค้าง เกิด 502 Bad Gateway | ใส่ **`resolver 127.0.0.11` และใช้ตัวแปร** เพื่อค้นหา IP ใหม่อัตโนมัติ |
+| **3. 🔌 Daemon Worker** | ถือท่อ Connection เดียววนลูปตลอดชาติ พอหลุดแอบดับเงียบ | ใช้รูปแบบ **Acquire-Use-Release ต่อรอบลูป** + ตรวจสอบความสดของท่อเสมอ |
+| **4. 💾 Live Data Pipeline** | เก็บแค่ใน Cache/Memory หน้าจอติดแต่ DB ว่าง ปิดเครื่องข้อมูลหาย | ทำ **Dual-Storage + Periodic Batch Flush** ลงฐานข้อมูลถาวรเป็นระยะ |
+
+---
+
+## 🛡️ 6. กฎเหล็กประจำตัวระดับ Production (Enterprise Golden Rules)
 
 1. **🔒 ห้ามเปิดพอร์ต DB และ Backend ออกสู่อินเทอร์เน็ตตรงๆ:** ต้องผ่าน NGINX Gateway เสมอ
 2. **🧹 ต้องมี Log Rotation เสมอ (`max-size: 10m`):** ป้องกันไม่ให้ไฟล์ล็อกแอบสูบพื้นที่ 264 GB บนเซิร์ฟเวอร์จนเต็ม
@@ -278,12 +397,14 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 4. **🇹🇭 ฐานข้อมูลต้องใช้ `utf8mb4` เสมอ:** ข้อมูลภาษาไทยต้องไม่แสดงผลเป็น `???`
 5. **🧱 เปิด Firewall เฉพาะพอร์ตจำเป็น:** บนเครื่องเซิร์ฟเวอร์ (Ubuntu UFW) เปิดเฉพาะพอร์ต 22 (SSH), 80 (HTTP), 443 (HTTPS) เท่านั้น เพื่อป้องกันไม่ให้ผู้ไม่ประสงค์ดีแฮกผ่านพอร์ตอื่น
 6. **☁️ ปกป้องเซิร์ฟเวอร์ด้วย Cloudflare เสมอ:** ไม่เปิดเผย IP จริงของเซิร์ฟเวอร์สู่อินเทอร์เน็ต เปิด Proxy (เมฆสีส้ม ☁️) หรือใช้ Cloudflare Tunnel เพื่อป้องกันการโดนยิงเว็บล่ม (DDoS) และรับกุญแจเขียว HTTPS ฟรี
+7. **🏛️ ยึดมั่น 4 เสาหลักความทนทาน:** ต้องมี Cold-Start Retry, NGINX Dynamic DNS, Worker Safe Lifecycle และ Dual-Storage เสมอ
 
 ---
 
-## 🔍 6. คู่มือแก้ปัญหาด่วนระดับ Production (Enterprise Troubleshooting)
+## 🔍 7. คู่มือแก้ปัญหาด่วนระดับ Production (Enterprise Troubleshooting)
 
-* **502 Bad Gateway จาก NGINX:** ตู้ข้างใน (Frontend หรือ Backend) กำลังดับ หรือยังสตาร์ทไม่เสร็จ ให้สั่ง `docker logs app_backend` ดูสาเหตุ
+* **502 Bad Gateway จาก NGINX:** ตู้ข้างใน (Frontend หรือ Backend) กำลังดับ หรือเพิ่งรีสตาร์ทแล้วได้ IP ใหม่ ให้ตรวจสอบว่าใน `nginx.conf` ใส่ `resolver 127.0.0.11 valid=5s;` และใช้ตัวแปร `set $backend` แล้วหรือยัง
+* **Worker แอบดับเงียบ / หลุด Connection:** ตรวจสอบว่าในลูป Worker มีการเบิก-ใช้-คืนท่อ (Acquire-Use-Release) หรือไม่ ห้ามถือ Connection ข้ามลูป
 * **ฮาร์ดดิสก์เซิร์ฟเวอร์เต็ม (`No space left on device`):** สั่งรันคำสั่งล้างภาพและ Cache ขยะ:
   ```bash
   docker system prune -a --volumes=false
@@ -293,7 +414,7 @@ sudo ufw enable                      # สั่งเปิดใช้งา�
 
 ---
 
-## 💬 7. คลังคำสั่งสำเร็จรูปสำหรับผู้ใช้ (Production Magic Prompts)
+## 💬 8. คลังคำสั่งสำเร็จรูปสำหรับผู้ใช้ (Production Magic Prompts)
 
 ผู้ใช้สามารถก๊อปปี้ข้อความเหล่านี้ไปสั่ง AI ได้ทันที:
 

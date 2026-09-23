@@ -1,8 +1,8 @@
-# 👑 BOSS AI (v1.2.0) — Universal Skills Installer
+# 👑 BOSS AI (v1.3.0) — Universal Skills Installer
 
 แพ็กเกจติดตั้งชุดสกิลมาตรฐานระดับสากลสำหรับนักพัฒนาและสาย Vibe Coding:
 1. **`🐳 docker-workflow`**: การพัฒนาเว็บด้วย Docker 3 ตู้ (หน้าบ้าน, หลังบ้าน, โกดังวัตถุดิบ, ดูฐานข้อมูลผ่านเว็บ Adminer, แก้โค้ดสด Live Reload, ปลดล็อก CORS, ภาษาไทย utf8mb4)
-2. **`🏭 production-architecture`**: การยกระดับสู่ Production ระดับองค์กร (NGINX Gateway, Log Rotation กันดิสก์เต็ม, Dynamic RAM, กำแพงไฟ UFW, Cloudflare ซ่อน IP และสำรองข้อมูลอัตโนมัติ)
+2. **`🏭 production-architecture`**: การยกระดับสู่ Production ระดับองค์กร (NGINX Gateway พร้อม Dynamic DNS Resolver, 4 เสาหลักความทนทานระดับองค์กร, Log Rotation กันดิสก์เต็ม, Dynamic RAM, กำแพงไฟ UFW, Cloudflare ซ่อน IP และสำรองข้อมูลอัตโนมัติ)
 3. **`🌿 git-team-workflow`**: การทำงานร่วมกันเป็นทีมด้วย Git (โมเดลจุดเซฟเกม, ไม่ใช้ศัพท์ยาก, AI จัดการ Add/Commit/Push/PR และแก้ Conflict ให้อัตโนมัติ)
 
 ติดตั้งให้กับ **AI Assistants ทุกตัวในโลก** ได้ในคำสั่งเดียว!
@@ -40,7 +40,7 @@ npx boss-ai --global
 
 ---
 
-## 📦 ในแพ็กเกจนี้ประกอบด้วย 3 สกิลมาตรฐาน (v1.2.0):
+## 📦 ในแพ็กเกจนี้ประกอบด้วย 3 สกิลมาตรฐาน (v1.3.0):
 
 ### 1. 🐳 Docker 3-Tier Workflow & Development (ฉบับสมบูรณ์ 100%)
 * **กฎ 3 ตู้ (ร้านอาหารโมเดล):** แยกชัดเจนระหว่าง **หน้าบ้าน (Frontend :3000)**, **หลังบ้าน (Backend API :3001)** และ **โกดังวัตถุดิบ (Database :3307)**
@@ -48,9 +48,14 @@ npx boss-ai --global
 * **Mental Model เข้าใจง่าย:** เปรียบเทียบ Dockerfile (พิมพ์เขียว) ➔ Image (ข้าวกล่องแช่แข็ง) ➔ Container (จานอาหารพร้อมกิน) ➔ Volume (ตู้เซฟเก็บของถาวร) ➔ Port (ท่อเจาะรูฝาตู้)
 * **แก้โค้ดสด (Live Reload):** ผูก Bind Mounts พร้อม Anonymous Volume (`/app/node_modules`) แก้โค้ดในเครื่อง เซิร์ฟเวอร์ในตู้รีสตาร์ททันทีโดยไม่ต้อง Build ใหม่
 * **กันบั๊กตั้งแต่ต้นทาง:** ปลดล็อก CORS ที่หลังบ้านเสมอ, ตั้งค่า `utf8mb4` ภาษาไทยไม่เป็น `???`, ใส่ `healthcheck` ให้หลังบ้านรอฐานข้อมูลวอร์มเครื่องเสร็จก่อน
-* **คลังคำสั่ง & แก้บั๊ก 9 อาการ:** รวมคำสั่งประจำวัน `up -d`, `down`, `ps`, `logs -f`, `exec`, `stats` และวิธีแก้พอร์ตชน, แรมหมด (Exit code 137), YAML พัง
+* **คลังคำสั่ง & แก้บั๊ก 10 อาการ:** รวมคำสั่งประจำวัน `up -d`, `down`, `ps`, `logs -f`, `exec`, `stats` และวิธีแก้พอร์ตชน, แรมหมด (Exit code 137), YAML พัง, Cold-Start Retry และ Worker ดับเงียบ
 
 ### 2. 🏭 Enterprise Production Architecture (สถาปัตยกรรมระดับองค์กร)
+* **🏛️ 4 เสาหลักมาตรฐานความทนทานระดับองค์กร (Universal Resilience Standards):**
+  1. ⏳ **Database Cold-Start & Retry Resilience:** มี Retry Loop 10–15 รอบ (20–30 วินาที) รอจนกว่า DB จะพร้อม ไม่แอบหนีไปใช้ In-Memory/SQLite
+  2. 🔄 **Dynamic Service Discovery (Anti-Stale DNS):** NGINX ใส่ `resolver 127.0.0.11 valid=5s;` และใช้ตัวแปร ค้นหา IP ใหม่เสมอเมื่อตู้รีสตาร์ท ป้องกัน 502 Bad Gateway ค้าง
+  3. 🔌 **Worker Connection Lifecycle:** โปรเซสเบื้องหลังใช้แบบ Acquire-Use-Release (เบิก-ใช้-คืน) ต่อรอบลูป + `pool_pre_ping=True` ป้องกันบอทแอบดับเงียบ
+  4. 💾 **Dual-Storage Architecture:** จัดเก็บ 2 ชั้นสำหรับข้อมูลสด (RAM/Cache ตอบสนองใน 1ms + Periodic Batch Flush บันทึกลง SQL ถาวร ข้อมูลไม่สูญหาย)
 * **🛡️ NGINX Gateway ด่านหน้า:** พอร์ต 80 / 443 รับแขกหน้าสุด ทำ Reverse Proxy ปิดพอร์ตภายในทั้งหมดไม่ให้ถูกโจมตี
 * **🧹 Log Rotation กันดิสก์เต็ม:** จำกัดขนาด Log สูงสุด 10MB หมุนเวียน 3 ไฟล์ ป้องกันฮาร์ดดิสก์เซิร์ฟเวอร์เต็ม 100%
 * **🔄 Auto-Restart ฟื้นชีพตัวเอง:** ตั้งค่า `restart: unless-stopped` เซิร์ฟเวอร์รีบูต ตู้ฟื้นขึ้นมาทำงานต่อทันที

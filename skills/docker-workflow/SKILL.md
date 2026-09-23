@@ -423,11 +423,12 @@ docker system prune -a --volumes=false
 | **2. ตู้ดับทันที (`Exited with code 0 หรือ 1`)** | โค้ดในโปรแกรมมี Syntax Error หรือคำสั่ง start สั่งผิด | รัน `docker compose logs [ชื่อตู้]` เพื่ออ่านบรรทัดที่พัง แล้วแก้โค้ดที่ไฟล์นั้น |
 | **3. ตู้ดับจากแรมหมด (`Exit code 137`)** | Container ถูกระบบตัดการทำงานเพราะแรมไม่พอ (OOM) | ปรับเพิ่มแรมใน Docker Desktop Settings หรือตรวจดูการกินแรมด้วย `docker stats` |
 | **4. หน้าบ้านเรียกหลังบ้านแล้วบล็อก (CORS Error: `No Access-Control-Allow-Origin`)** | เบราว์เซอร์บล็อกการส่งข้อมูลข้ามพอร์ต | ใน Backend ให้ลงแพ็กเกจ `npm install cors` แล้วใส่ `app.use(cors())` ด้านบนสุดของ Express |
-| **5. หลังบ้านต่อ MySQL ไม่ได้ (`ECONNREFUSED`)** | หลังบ้านตื่นก่อน ฐานข้อมูลยังวอร์มเครื่องไม่เสร็จ | ใส่ `healthcheck` ในตู้ db และใส่ `depends_on: db: condition: service_healthy` ในตู้ backend |
+| **5. หลังบ้านต่อ MySQL ไม่ได้ (`ECONNREFUSED`)** | หลังบ้านตื่นก่อน ฐานข้อมูลยังวอร์มเครื่องไม่เสร็จ (Cold-Start) | ใส่ `healthcheck` ในตู้ db, ใส่ `depends_on: db: condition: service_healthy` และเขียน Retry Loop ในโค้ดหลังบ้านอย่างน้อย 10-15 รอบ (หน่วงเวลารวม 20-30 วินาที) |
 | **6. ข้อมูลภาษาไทยใน MySQL กลายเป็น `???`** | Charset ของ MySQL เป็น `latin1` เริ่มต้น | ใส่ `command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci` ในตู้ db |
 | **7. แก้โค้ดในเครื่องแล้ว หน้าเว็บไม่เปลี่ยน (Live Reload ไม่ทำงาน)** | ไม่ได้ผูก Volume หรือไม่มีคำสั่ง watch ใน container | ตรวจสอบว่าใน `compose.yaml` มี `volumes: - ./backend:/app` และใน `package.json` รันด้วย `node --watch app.js` |
 | **8. DBeaver ต่อ MySQL 8 ไม่ได้ (`Public Key Retrieval is not allowed`)** | ระบบความปลอดภัยรหัสผ่านแบบใหม่ของ MySQL 8 | ใน DBeaver ไปที่ Driver properties แล้วเปลี่ยน `allowPublicKeyRetrieval` เป็น `true` หรือเปิด Adminer ที่ `http://localhost:8085` แทน |
 | **9. YAML พัง (`mapping values are not allowed` หรือ `could not find ':'`)** | การเคาะเว้นวรรค (Indentation) ผิด หรือลืมเว้นวรรคหลังเครื่องหมาย `:` | ใน YAML ต้องใช้ Spacebar เสมอ ห้ามใช้ Tab และหลัง `:` ต้องเคาะเว้นวรรค 1 ครั้งเสมอ |
+| **10. Worker / บอททำงานเบื้องหลังแอบดับเงียบ (`Connection closed` หรือ `OperationalError`)** | ถือท่อ Connection ฐานข้อมูลค้างข้ามลูป หรือเจอ MySQL Idle Timeout | ใช้รูปแบบ **Acquire-Use-Release (เบิก-ใช้-คืน)** ต่อรอบลูป ห้ามถือท่อค้างข้ามลูป และเปิดระบบตรวจความสดใหม่ของท่อ (`pool_pre_ping=True`) |
 
 ---
 
