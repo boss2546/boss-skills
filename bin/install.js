@@ -26,8 +26,12 @@ const targetAIs = {
   aider: !hasAiFilter || args.includes('--all') || args.includes('--aider')
 };
 
+const packageRoot = path.resolve(__dirname, '..');
+const cwd = process.cwd();
+const pkg = require('../package.json');
+
 console.log('\n👑 ========================================================================');
-console.log('🚀 BOSS AI — Universal Skills Installer (คำสั่งเดียว ได้ครบทุก AI)');
+console.log(`🚀 BOSS AI (v${pkg.version}) — Universal Skills Installer (คำสั่งเดียว ได้ครบทุก AI)`);
 console.log('========================================================================');
 const skillsList = [
   installDocker ? '🐳 1. docker-workflow (3-Tier & Dev)' : '',
@@ -35,11 +39,9 @@ const skillsList = [
   installGit ? '🌿 3. git-team-workflow' : ''
 ].filter(Boolean);
 console.log(`📦 สกิลที่จะติดตั้ง: \n   ${skillsList.join('\n   ')}`);
-console.log(`🎯 โหมด: ${isGlobal ? '🌐 Global (ติดตั้งเข้าแกนกลางของเครื่อง Mac ใช้งานได้ทุกโปรเจกต์)' : '📁 Project Workspace (ติดตั้งเข้าโปรเจกต์ปัจจุบัน)'}`);
+const osName = os.platform() === 'darwin' ? 'Mac' : os.platform() === 'linux' ? 'Linux / Server' : 'ระบบ';
+console.log(`🎯 โหมด: ${isGlobal ? `🌐 Global (ติดตั้งเข้าแกนกลางของเครื่อง ${osName} ใช้งานได้ทุกโปรเจกต์)` : '📁 Project Workspace (ติดตั้งเข้าโปรเจกต์ปัจจุบัน)'}`);
 console.log('🤖 AI ที่รองรับ: Claude Code, Cursor, GitHub Copilot/Codex, Antigravity, Windsurf, Cline, Aider\n');
-
-const packageRoot = path.resolve(__dirname, '..');
-const cwd = process.cwd();
 
 const dockerSkillSrc = path.join(packageRoot, 'skills', 'docker-workflow');
 const prodSkillSrc = path.join(packageRoot, 'skills', 'production-architecture');
