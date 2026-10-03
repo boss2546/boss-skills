@@ -1,59 +1,46 @@
-# 🔮 Oracle & Knowledge Vault System (Staging Area)
+# 🔮 Oracle & Obsidian Knowledge Vault System (Staging Area)
 
-พื้นที่จัดเก็บไฟล์ต้นฉบับ (Raw Staging) ทั้งหมดของระบบ Oracle และ Obsidian Knowledge Vault เพื่อเตรียมพร้อมสำหรับการสังเคราะห์ เรียบเรียง และออกแบบเป็น Universal Skill ใหม่สำหรับ `boss-ai`
+พื้นที่จัดเก็บไฟล์ต้นฉบับ (Raw Staging) ของระบบ **Oracle (External Brain)** และ **Obsidian Knowledge Vault** เพื่อเตรียมพร้อมสำหรับการสังเคราะห์ เรียบเรียง และออกแบบเป็น Universal Skill ใหม่สำหรับ `boss-ai`
 
 ---
 
-## 📂 โครงสร้างที่นำเข้ามาจัดเก็บ (Source Map)
+## 📂 โครงสร้างที่จัดเก็บในโปรเจกต์ (Clean Structure)
 
 ```text
 staging/oracle-knowledge-system/
 ├── 1-skill-definitions/                  # คำนิยามสกิลต้นฉบับ
-│   ├── oracle/                           # สกิล Oracle ทั้งหมด 21 โฟลเดอร์ (จาก ~/.hermes/skills/oracle/)
-│   │   ├── standup/ & oracle-standup/    # วางแผนประจำวัน
+│   ├── oracle/                           # สกิล Oracle ทั้งหมด (จาก ~/.hermes/skills/oracle/)
+│   │   ├── standup/ & oracle-standup/    # วางแผนประจำวัน / เริ่มวัน (Morning Orient)
 │   │   ├── rrr/ & oracle-rrr/            # สรุปทบทวนงาน (Review/Reflect/Reset)
-│   │   ├── recap/ & oracle-recap/        # สรุปสถานะงาน
-│   │   ├── learn/ & oracle-learn/        # จดจำองค์ความรู้
-│   │   ├── fyi/                          # จดบันทึกสั้น
-│   │   ├── feel/ & oracle-feel/          # ประเมินอารมณ์และสภาวะ
-│   │   ├── trace/ & oracle-trace/        # บันทึกสืบย้อน
+│   │   ├── recap/ & oracle-recap/        # สรุปสถานะงานด่วน (Mid-session Recap)
+│   │   ├── learn/ & oracle-learn/        # จดจำองค์ความรู้ / สกัดความรู้จากโค้ด
+│   │   ├── fyi/                          # จดบันทึกข้อเท็จจริงสั้น
+│   │   ├── feel/ & oracle-feel/          # ประเมินสภาวะ อารมณ์ และความเหนื่อยล้า
+│   │   ├── trace/ & oracle-trace/        # บันทึกสืบย้อนที่มาที่ไป
 │   │   ├── forward/ & oracle-forward/    # ส่งต่องาน / Handoff
 │   │   ├── awaken/                       # ปลุกการรับรู้บริบท
-│   │   ├── oracle-philosophy/            # ปรัชญาและแกนกลาง Oracle
-│   │   ├── oracle-session-lifecycle/     # วงจรชีวิตของเซสชัน
-│   │   └── who-are-you/ & oracle-who-are-you/ # ตัวตนของ Oracle
-│   └── note-taking-obsidian/             # สกิลเชื่อมต่อ Obsidian (จาก ~/.hermes/skills/note-taking/obsidian/)
+│   │   ├── oracle-philosophy/            # ปรัชญาแม่บท: "The Oracle Keeps the Human Human"
+│   │   ├── oracle-session-lifecycle/     # วงจรชีวิตของเซสชัน (Orient -> Act -> Reflect)
+│   │   └── who-are-you/                  # ตัวตนของ Oracle (Thinking Partner)
+│   └── note-taking-obsidian/             # สกิลเชื่อมต่อ Obsidian Vault (Filesystem-First)
 │
-├── 2-data-vaults/                        # คลังความรู้และข้อมูลจริง
-│   ├── oracle-vault-psi/                 # คลังความรู้ถาวร (~/ψ)
-│   │   ├── inbox/                        # รับข้อมูลเข้า / Handoff
-│   │   ├── learn/                        # คลังสรุปองค์ความรู้ที่เรียนรู้แล้ว
-│   │   ├── memory/                       # บันทึกความจำระยะยาว
-│   │   ├── active/                       # งานและโปรเจกต์ที่กำลังโฟกัส
-│   │   ├── identity/                     # ตัวตนและปรัชญา Oracle
-│   │   ├── trace/                        # บันทึกสืบย้อนที่มาที่ไป
-│   │   ├── archive/                      # คลังเก็บข้อมูลประวัติเก่า
-│   │   ├── outbox/                       # ข้อมูลส่งออก
-│   │   ├── projects/                     # โปรเจกต์
-│   │   └── writing/                      # งานเขียน
-│   ├── obsidian-vault-documents/         # คลังสมุดโน้ต ~/Documents/Obsidian Vault
-│   └── obsidian-vault-pdb/               # คลังสมุดโน้ต P.D.B Vault (จาก Desktop/aiis/P.D.B/vault)
-│
-└── 3-pdb-reference/                      # โค้ดและเอกสารอ้างอิง P.D.B ทั้งหมด (จาก Desktop/aiis/P.D.B)
-    ├── docs/                             # เอกสารสถาปัตยกรรม LLM-Wiki, การย่อยสรุป และไดอารี่
-    ├── lib/                              # โค้ด JavaScript จัดการ Obsidian (analyze, clean, storage, write-obsidian)
-    ├── tools/                            # เครื่องมือ digest
-    └── tests/                            # ชุดทดสอบ
+└── 2-data-vaults/                        # คลังความรู้และข้อมูลจริง
+    ├── oracle-vault-psi/                 # คลังความรู้ถาวร (~/ψ)
+    │   ├── inbox/                        # รับข้อมูลเข้า / Handoff จากเซสชันก่อน
+    │   ├── learn/                        # คลังสรุปองค์ความรู้เชิงลึกของแต่ละระบบ/Repo
+    │   ├── memory/                       # บันทึกความจำระยะยาว (Retrospectives, Learnings)
+    │   ├── active/                       # งานและโปรเจกต์ที่กำลังโฟกัส ณ ปัจจุบัน
+    │   ├── identity/                     # ตัวตน ค่านิยม และ Profile ของคุณบอส
+    │   ├── trace/                        # บันทึกสืบย้อนที่มาที่ไปของแนวคิด
+    │   └── archive/                      # คลังเก็บข้อมูลประวัติเก่า (Nothing is Deleted)
+    └── obsidian-vault-documents/         # คลังสมุดโน้ต ~/Documents/Obsidian Vault
 ```
 
 ---
 
-## 🎯 แผนการสังเคราะห์เป็นสกิลใหม่ (Synthesis Strategy)
-1. **วิเคราะห์ความซ้ำซ้อน**: สกิลฝั่ง Oracle ใน Hermes มีการสร้างคู่ขนานระหว่างชื่อสั้น (`standup`, `rrr`, `recap`, `learn`) และชื่อเต็ม (`oracle-standup`, `oracle-rrr`, `oracle-recap`, `oracle-learn`) ซึ่งเป็น Alias
-2. **สร้างแกนกลาง Universal Core**: หลอมรวมวงจรชีวิตประจำวัน:
-   - **Morning / Start**: `standup` (เช็ค inbox, จัด priority)
-   - **During Work**: `learn` / `fyi` / `note` (บันทึกความรู้เข้า Vault)
-   - **Evening / End**: `rrr` / `recap` (สรุปทบทวนและ handoff สู่ active/archive)
-3. **เชื่อมต่อ 2-Layer Vault Architecture**:
-   - ชั้นที่ 1: **Oracle Psi Vault (`~/ψ`)** — คลังตัวตน ความจำระยะยาว และบทเรียน
-   - ชั้นที่ 2: **Obsidian Daily Digest (`~/Documents/Obsidian Vault` หรือ `P.D.B/vault`)** — กราฟความรู้และการม้วนสรุป (Hierarchical Rollup)
+## 🎯 สถาปัตยกรรม 2-Vault (Oracle + Obsidian)
+
+1. **Oracle Psi Vault (`~/ψ`)**:
+   - หน้าที่: เป็น **"สมองส่วนลึก" (Deep Memory & Identity)** เก็บตัวตน, ค่านิยม, บทเรียนเชิงลึก (`learn/`), และความจำระยะยาว (`memory/`)
+2. **Obsidian Vault (`~/Documents/Obsidian Vault`)**:
+   - หน้าที่: เป็น **"กระดานคิดงาน & กราฟความรู้" (Visual Knowledge Graph)** สำหรับจดโน้ตรายวัน, งานด่วน, และการเชื่อมโยงความสัมพันธ์ด้วย `[[Wikilinks]]`
