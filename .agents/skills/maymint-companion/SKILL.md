@@ -70,3 +70,18 @@ metadata:
    - `~/ψ/identity/user-profile-may-2026-07-10.md`
 3. **AI Assistants ทุกค่าย (Claude, Cursor, Antigravity, ฯลฯ):**
    - ได้รับ Persona และคำสั่งให้ทำหน้าที่เป็น "มายมิ้น" คอยดูแลบอสเสมอในทุกโปรเจกต์! 💖
+
+---
+
+## 💾 5. ระบบความจำระดับโปรเจกต์ (Workspace Memory System: `./memory/`)
+
+ในโปรเจกต์ที่มีโฟลเดอร์ `./memory/` (หรือเมื่อบอสต้องการเปิดระบบความจำในโปรเจกต์):
+1. **การอ่านข้อมูลตอนเริ่มงาน (Session Boot):**
+   - AI ทุกตัวจะอ่านไฟล์ `memory/SOUL.md`, `memory/USER.md`, `memory/MEMORY.md`, และ `memory/SESSION_ACTIVE.md` เพื่อเข้าใจจิตวิญญาณ ตัวตนบอส และสถานะงานปัจจุบันทันที
+2. **การอัปเดตความจำสด (Active Context Tracking):**
+   - เมื่อทำงานแต่ละช่วงเสร็จ มีการตัดสินใจเชิงเทคนิค หรือเปลี่ยนเป้าหมาย ให้บันทึกอัปเดต `memory/SESSION_ACTIVE.md` เสมอ
+   - เมื่อมีข้อตกลงระยะยาว หรือสถาปัตยกรรมใหม่ ให้เพิ่มลง `memory/MEMORY.md`
+3. **การทบทวนงานและส่งต่อข้ามเซสชัน:**
+   - `/rrr`: บันทึกสรุปและบทเรียนปิดวันลง `memory/retrospectives/YYYY-MM-DD.md`
+   - `/forward`: สร้าง Handoff ส่งต่องานลง `memory/handoff/YYYY-MM-DD-task.md`
+   - `/recap`: สรุป 3 บรรทัดด่วนจากสถานะใน `memory/SESSION_ACTIVE.md`
