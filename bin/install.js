@@ -8,10 +8,11 @@ const args = process.argv.slice(2);
 const isGlobal = args.includes('--global') || args.includes('-g');
 
 // ตัวเลือกคัดกรองสกิล (ค่าเริ่มต้น: ติดตั้งครบทุกสกิล)
-const installDocker = !args.includes('--git-only') && !args.includes('--prod-only') && !args.includes('--gateway-only');
-const installProd = !args.includes('--git-only') && !args.includes('--docker-only') && !args.includes('--gateway-only');
-const installGit = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--gateway-only');
-const installGateway = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--git-only');
+const installDocker = !args.includes('--git-only') && !args.includes('--prod-only') && !args.includes('--gateway-only') && !args.includes('--oracle-only');
+const installProd = !args.includes('--git-only') && !args.includes('--docker-only') && !args.includes('--gateway-only') && !args.includes('--oracle-only');
+const installGit = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--gateway-only') && !args.includes('--oracle-only');
+const installGateway = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--git-only') && !args.includes('--oracle-only');
+const installOracle = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--git-only') && !args.includes('--gateway-only');
 
 // ตัวเลือกคัดกรอง AI (ถ้าไม่ระบุ AI ใดๆ เจาะจง ให้ติดตั้งครบทุก AI)
 const aiFlags = ['--antigravity', '--gemini', '--claude', '--cursor', '--copilot', '--codex', '--windsurf', '--cline', '--roo', '--aider', '--all'];
@@ -38,7 +39,8 @@ const skillsList = [
   installDocker ? '🐳 1. docker-workflow (3-Tier & Dev)' : '',
   installProd ? '🏭 2. production-architecture (NGINX & Enterprise)' : '',
   installGit ? '🌿 3. git-team-workflow' : '',
-  installGateway ? '🌐 4. meuu-api-gateway (AI API Gateway & Router)' : ''
+  installGateway ? '🌐 4. meuu-api-gateway (AI API Gateway & Router)' : '',
+  installOracle ? '🔮 5. oracle-lifecycle (External Brain & ~/ψ Vault)' : ''
 ].filter(Boolean);
 console.log(`📦 สกิลที่จะติดตั้ง: \n   ${skillsList.join('\n   ')}`);
 const osName = os.platform() === 'darwin' ? 'Mac' : os.platform() === 'linux' ? 'Linux / Server' : 'ระบบ';
@@ -49,6 +51,7 @@ const dockerSkillSrc = path.join(packageRoot, 'skills', 'docker-workflow');
 const prodSkillSrc = path.join(packageRoot, 'skills', 'production-architecture');
 const gitSkillSrc = path.join(packageRoot, 'skills', 'git-team-workflow');
 const gatewaySkillSrc = path.join(packageRoot, 'skills', 'meuu-api-gateway');
+const oracleSkillSrc = path.join(packageRoot, 'skills', 'oracle-lifecycle');
 
 // 1. สรุปกฎ Docker Workflow สำหรับ AI
 const dockerRuleSummary = `
@@ -135,6 +138,49 @@ When connecting to or integrating with the central AI API Gateway (9Router):
    - Models List: \`GET /v1/models\`.
 4. **Full Reference**: Read detailed request/response schemas and code examples in \`.agents/skills/meuu-api-gateway/SKILL.md\`.
 `;
+
+// 5. สรุปกฎ Oracle External Brain & Lifecycle สำหรับ AI
+const oracleRuleSummary = `
+## 🔮 Oracle External Brain & Lifecycle Standards (~/ψ Vault)
+When assisting as an Oracle-style external brain, co-thinker, and memory partner:
+1. **The Oracle Keeps the Human Human**:
+   - Act as a thinking partner, not merely a command runner. Reduce cognitive load, preserve human agency, and present clear trade-offs.
+   - **Nothing is Deleted**: Valuable history, lessons, and context are never deleted; archive closed projects under \`~/ψ/archive/\`.
+2. **Master Lifecycle Commands**:
+   - **/standup**: Morning orientation. Check \`~/ψ/inbox/handoff/\` and \`~/ψ/active/\`, summarize top 3 grounded priorities with first actionable step.
+   - **/learn <target>**: Deep codebase & architectural extraction. Extract architecture, data flows, and risks into \`~/ψ/learn/<target>/YYYY-MM-DD.md\`.
+   - **/rrr**: Review, Reflect, Reset. Summarize session achievements, extract lessons, save durable signals into \`~/ψ/memory/retrospectives/\`.
+   - **/forward**: Session handoff. Save goal, current state, blockers, and immediate next commands to \`~/ψ/inbox/handoff/YYYY-MM-DD-task.md\`.
+   - **/recap**: Mid-session 3-line snapshot (Goal, Done, Pending, Next).
+   - **/feel**: Adapt tone and pace to user energy (tired -> minimal steps, rushed -> direct actions, stressed -> reduce cognitive load).
+3. **Universal Psi Vault Architecture (~/ψ)**:
+   - Always link project insights to the central vault: \`inbox/\`, \`learn/\`, \`memory/\`, \`active/\`, \`identity/\`, \`trace/\`, \`archive/\`.
+4. **Full Reference**: Read detailed operational guide in \`.agents/skills/oracle-lifecycle/SKILL.md\`.
+`;
+
+// Helper: สร้างโครงสร้างคลังความรู้ถาวร ~/ψ บนเครื่องผู้ใช้อัตโนมัติ (Bootstrap Vault)
+function ensurePsiVault() {
+  const home = os.homedir();
+  const psiVault = path.join(home, 'ψ');
+  const subdirs = [
+    'inbox/handoff',
+    'active',
+    'learn',
+    'memory/retrospectives',
+    'memory/learnings',
+    'memory/resonance',
+    'identity',
+    'trace',
+    'archive'
+  ];
+  for (const sub of subdirs) {
+    const dir = path.join(psiVault, sub);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  }
+  return psiVault;
+}
 
 // Helper: คัดลอกโฟลเดอร์แบบ recursive
 function copyDirSync(src, dest) {
@@ -230,6 +276,10 @@ try {
       copyDirSync(gatewaySkillSrc, path.join(agyGlobal, 'meuu-api-gateway'));
       installedList.push(`[Antigravity Global] -> ~/.gemini/config/skills/meuu-api-gateway`);
     }
+    if (installOracle && fs.existsSync(oracleSkillSrc)) {
+      copyDirSync(oracleSkillSrc, path.join(agyGlobal, 'oracle-lifecycle'));
+      installedList.push(`[Antigravity Global] -> ~/.gemini/config/skills/oracle-lifecycle`);
+    }
 
     // 2. Claude Code Global (~/.claude/skills/)
     const claudeGlobal = path.join(home, '.claude', 'skills');
@@ -249,6 +299,10 @@ try {
       copyDirSync(gatewaySkillSrc, path.join(claudeGlobal, 'meuu-api-gateway'));
       installedList.push(`[Claude Code Global]  -> ~/.claude/skills/meuu-api-gateway`);
     }
+    if (installOracle && fs.existsSync(oracleSkillSrc)) {
+      copyDirSync(oracleSkillSrc, path.join(claudeGlobal, 'oracle-lifecycle'));
+      installedList.push(`[Claude Code Global]  -> ~/.claude/skills/oracle-lifecycle`);
+    }
 
     // 3. Cursor Global (~/.cursorrules)
     const cursorGlobal = path.join(home, '.cursorrules');
@@ -256,7 +310,14 @@ try {
     if (installProd) safeInjectRule(cursorGlobal, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
     if (installGit) safeInjectRule(cursorGlobal, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
     if (installGateway) safeInjectRule(cursorGlobal, gatewayRuleSummary, 'MEUU-API-GATEWAY');
+    if (installOracle) safeInjectRule(cursorGlobal, oracleRuleSummary, 'ORACLE-LIFECYCLE');
     installedList.push(`[Cursor IDE Global]   -> ~/.cursorrules`);
+
+    // 4. Bootstrap Oracle Psi Vault (~/ψ)
+    if (installOracle) {
+      ensurePsiVault();
+      installedList.push(`[Oracle Psi Vault]   -> ~/ψ/ (inbox, active, learn, memory, identity, archive)`);
+    }
 
   } else {
     // ==========================================
@@ -290,6 +351,9 @@ try {
       fs.rmSync(path.join(cwd, '.windsurf', 'rules', 'docker-3tier.md'), { force: true });
     }
 
+    // Ensure Psi Vault exists on host
+    if (installOracle) ensurePsiVault();
+
     // 1. Antigravity & Gemini Agent (.agents/skills/ + AGENTS.md + GEMINI.md)
     if (targetAIs.antigravity) {
       const agySkills = path.join(cwd, '.agents', 'skills');
@@ -309,6 +373,10 @@ try {
         copyDirSync(gatewaySkillSrc, path.join(agySkills, 'meuu-api-gateway'));
         installedList.push(`[Antigravity / Gemini] -> .agents/skills/meuu-api-gateway`);
       }
+      if (installOracle && fs.existsSync(oracleSkillSrc)) {
+        copyDirSync(oracleSkillSrc, path.join(agySkills, 'oracle-lifecycle'));
+        installedList.push(`[Antigravity / Gemini] -> .agents/skills/oracle-lifecycle`);
+      }
       if (installDocker) {
         safeInjectRule(path.join(cwd, 'AGENTS.md'), dockerRuleSummary, 'DOCKER-WORKFLOW');
         safeInjectRule(path.join(cwd, 'GEMINI.md'), dockerRuleSummary, 'DOCKER-WORKFLOW');
@@ -325,6 +393,10 @@ try {
         safeInjectRule(path.join(cwd, 'AGENTS.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
         safeInjectRule(path.join(cwd, 'GEMINI.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
       }
+      if (installOracle) {
+        safeInjectRule(path.join(cwd, 'AGENTS.md'), oracleRuleSummary, 'ORACLE-LIFECYCLE');
+        safeInjectRule(path.join(cwd, 'GEMINI.md'), oracleRuleSummary, 'ORACLE-LIFECYCLE');
+      }
       installedList.push(`[Antigravity Rules]     -> AGENTS.md & GEMINI.md`);
     }
 
@@ -334,13 +406,15 @@ try {
       if (installProd) safeInjectRule(path.join(cwd, 'CLAUDE.md'), prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(path.join(cwd, 'CLAUDE.md'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(path.join(cwd, 'CLAUDE.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(path.join(cwd, 'CLAUDE.md'), oracleRuleSummary, 'ORACLE-LIFECYCLE');
 
       const claudeSkills = path.join(cwd, '.claude', 'skills');
       if (installDocker && fs.existsSync(dockerSkillSrc)) copyDirSync(dockerSkillSrc, path.join(claudeSkills, 'docker-workflow'));
       if (installProd && fs.existsSync(prodSkillSrc)) copyDirSync(prodSkillSrc, path.join(claudeSkills, 'production-architecture'));
       if (installGit && fs.existsSync(gitSkillSrc)) copyDirSync(gitSkillSrc, path.join(claudeSkills, 'git-team-workflow'));
       if (installGateway && fs.existsSync(gatewaySkillSrc)) copyDirSync(gatewaySkillSrc, path.join(claudeSkills, 'meuu-api-gateway'));
-      installedList.push(`[Claude Code]           -> CLAUDE.md & .claude/skills/ (4 สกิล)`);
+      if (installOracle && fs.existsSync(oracleSkillSrc)) copyDirSync(oracleSkillSrc, path.join(claudeSkills, 'oracle-lifecycle'));
+      installedList.push(`[Claude Code]           -> CLAUDE.md & .claude/skills/ (5 สกิล)`);
     }
 
     // 3. Cursor IDE (.cursorrules + .cursor/rules/*.mdc)
@@ -349,6 +423,7 @@ try {
       if (installProd) safeInjectRule(path.join(cwd, '.cursorrules'), prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(path.join(cwd, '.cursorrules'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(path.join(cwd, '.cursorrules'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(path.join(cwd, '.cursorrules'), oracleRuleSummary, 'ORACLE-LIFECYCLE');
 
       const cursorMdcDir = path.join(cwd, '.cursor', 'rules');
       fs.mkdirSync(cursorMdcDir, { recursive: true });
@@ -364,6 +439,9 @@ try {
       if (installGateway) {
         fs.writeFileSync(path.join(cursorMdcDir, 'meuu-api-gateway.mdc'), `---\ndescription: Meuu AI API Gateway Standards (api.meuu.club)\nglobs: "**/*"\n---\n${gatewayRuleSummary}`, 'utf8');
       }
+      if (installOracle) {
+        fs.writeFileSync(path.join(cursorMdcDir, 'oracle-lifecycle.mdc'), `---\ndescription: Oracle External Brain & Lifecycle Standards (~/ψ Vault)\nglobs: "**/*"\n---\n${oracleRuleSummary}`, 'utf8');
+      }
       installedList.push(`[Cursor IDE]            -> .cursorrules & .cursor/rules/*.mdc`);
     }
 
@@ -374,6 +452,7 @@ try {
       if (installProd) safeInjectRule(copilotPath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(copilotPath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(copilotPath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(copilotPath, oracleRuleSummary, 'ORACLE-LIFECYCLE');
       installedList.push(`[Copilot / Codex]       -> .github/copilot-instructions.md`);
     }
 
@@ -384,6 +463,7 @@ try {
       if (installProd) safeInjectRule(windsurfPath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(windsurfPath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(windsurfPath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(windsurfPath, oracleRuleSummary, 'ORACLE-LIFECYCLE');
 
       const windsurfDir = path.join(cwd, '.windsurf', 'rules');
       fs.mkdirSync(windsurfDir, { recursive: true });
@@ -391,6 +471,7 @@ try {
       if (installProd) safeInjectRule(path.join(windsurfDir, 'production-architecture.md'), prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(path.join(windsurfDir, 'git-team-workflow.md'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(path.join(windsurfDir, 'meuu-api-gateway.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(path.join(windsurfDir, 'oracle-lifecycle.md'), oracleRuleSummary, 'ORACLE-LIFECYCLE');
       installedList.push(`[Windsurf (Codeium)]    -> .windsurfrules & .windsurf/rules/`);
     }
 
@@ -401,6 +482,7 @@ try {
       if (installProd) safeInjectRule(clinePath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(clinePath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(clinePath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(clinePath, oracleRuleSummary, 'ORACLE-LIFECYCLE');
       installedList.push(`[Cline / Roo Code]      -> .clinerules`);
     }
 
@@ -411,6 +493,7 @@ try {
       if (installProd) safeInjectRule(aiderPath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(aiderPath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       if (installGateway) safeInjectRule(aiderPath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      if (installOracle) safeInjectRule(aiderPath, oracleRuleSummary, 'ORACLE-LIFECYCLE');
       installedList.push(`[Aider]                 -> CONVENTIONS.md`);
     }
   }

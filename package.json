@@ -1,7 +1,7 @@
 {
   "name": "boss-ai",
-  "version": "1.4.0",
-  "description": "Universal AI Agent Skills: Docker 3-Tier Workflow, Enterprise Production Architecture (NGINX, Cloudflare, Log Rotation), Git Team Workflow, and AI API Gateway (9Router & LLM Routing) for Claude Code, Cursor, Copilot, Antigravity, Windsurf, Cline",
+  "version": "1.5.0",
+  "description": "Universal AI Agent Skills: Docker 3-Tier Workflow, Enterprise Production Architecture (NGINX, Cloudflare, Log Rotation), Git Team Workflow, AI API Gateway (9Router & LLM Routing), and Oracle External Brain Lifecycle (~/ψ Vault) for Claude Code, Cursor, Copilot, Antigravity, Windsurf, Cline",
   "main": "bin/install.js",
   "bin": {
     "boss-ai": "bin/install.js",
@@ -34,7 +34,13 @@
     "api-gateway",
     "llm-routing",
     "9router",
-    "meuu"
+    "meuu",
+    "oracle",
+    "external-brain",
+    "standup",
+    "rrr",
+    "vault",
+    "lifecycle"
   ],
   "author": "Boss (ratchanon2003)",
   "license": "MIT"

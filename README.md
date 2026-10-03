@@ -1,10 +1,11 @@
-# 👑 BOSS AI (v1.4.0) — Universal Skills Installer
+# 👑 BOSS AI (v1.5.0) — Universal Skills Installer
 
 แพ็กเกจติดตั้งชุดสกิลมาตรฐานระดับสากลสำหรับนักพัฒนาและสาย Vibe Coding:
 1. **`🐳 docker-workflow`**: การพัฒนาเว็บด้วย Docker 3 ตู้ (หน้าบ้าน, หลังบ้าน, โกดังวัตถุดิบ, ดูฐานข้อมูลผ่านเว็บ Adminer, แก้โค้ดสด Live Reload, ปลดล็อก CORS, ภาษาไทย utf8mb4)
 2. **`🏭 production-architecture`**: การยกระดับสู่ Production ระดับองค์กร (NGINX Gateway พร้อม Dynamic DNS Resolver, 4 เสาหลักความทนทานระดับองค์กร, Log Rotation กันดิสก์เต็ม, Dynamic RAM, กำแพงไฟ UFW, Cloudflare ซ่อน IP และสำรองข้อมูลอัตโนมัติ)
 3. **`🌿 git-team-workflow`**: การทำงานร่วมกันเป็นทีมด้วย Git (โมเดลจุดเซฟเกม, ไม่ใช้ศัพท์ยาก, AI จัดการ Add/Commit/Push/PR และแก้ Conflict ให้อัตโนมัติ)
 4. **`🌐 meuu-api-gateway`**: สกิลกลางแม่บท AI Infrastructure เชื่อมต่อ 9Router Gateway (OpenAI v1 + Claude Native, Claude Sonnet 4.6, Gemini 2.5 Flash, Multimodal Vision, เสียงพูด TTS ภาษาไทย, ถอดเสียง STT 2.7s และโควต้า 12,000 req/สัปดาห์)
+5. **`🔮 oracle-lifecycle`**: ระบบสมองที่สอง (External Brain) และวงจรชีวิตการทำงาน: วางแผนเริ่มวัน (`/standup`), สรุปทบทวนปิดวัน (`/rrr`), ถอดบทเรียนโค้ดเชิงลึก (`/learn`), ส่งต่องานไร้รอยต่อ (`/forward`), สรุปสถานะด่วน (`/recap`), ตรวจสอบสภาวะมนุษย์ (`/feel`) และคลังความรู้ถาวร 7 ชั้น `~/ψ` Vault (Nothing is Deleted)
 
 ติดตั้งให้กับ **AI Assistants ทุกตัวในโลก** ได้ในคำสั่งเดียว!
 
@@ -17,13 +18,13 @@
 ```bash
 npx boss-ai
 ```
-*(เพียง 1 วินาที AI ทุกตัวในโฟลเดอร์นั้นจะรู้จักและทำตามมาตรฐานทั้ง 3 สกิลทันที)*
+*(เพียง 1 วินาที AI ทุกตัวในโฟลเดอร์นั้นจะรู้จักและทำตามมาตรฐานทั้ง 5 สกิลทันที)*
 
-### 2. ใช้งานเข้าแกนกลางของเครื่อง Mac (Global Mode)
+### 2. ใช้งานเข้าแกนกลางของเครื่อง (Global Mode — แนะนำสำหรับเครื่องใหม่)
 ```bash
 npx boss-ai --global
 ```
-*(Claude Code, Antigravity/Gemini และ Cursor ในเครื่องนี้จะพกทั้ง 3 สกิลติดตัวไปทุกโฟลเดอร์ตลอดกาล)*
+*(Claude Code, Antigravity/Gemini และ Cursor ในเครื่องนี้จะพกทั้ง 5 สกิลติดตัวไปทุกโฟลเดอร์ พร้อมสร้างคลังสมุดสมองกลาง `~/ψ/` ให้ทันที)*
 
 ---
 
@@ -78,6 +79,19 @@ npx boss-ai --global
 * **Speech-to-Text (STT) 2.7s:** ถอดความเสียงเป็นข้อความความเร็วแสง และโฟลว์ลัด "ฟังเสียงแล้วตอบทันที" ใน 3.64 วินาที
 * **บริหารโควต้า 12,000 req/สัปดาห์:** ระบบ Round-Robin และ Auto-Failover สลับ 6 บัญชีอัตโนมัติภายใน 50ms เมื่อติด Rate Limit
 * **คู่มือเชื่อมต่อครบ 7 ค่าย:** วิธีตั้งค่าเชื่อมต่อกับ Cursor IDE, Claude Code CLI, Cline, Roo Code, Continue.dev, Windsurf และ SDKs (Python, LangChain, Vercel AI SDK)
+
+### 5. 🔮 Oracle Lifecycle & External Brain Standards (~/ψ Vault)
+* **ปรัชญา "The Oracle Keeps the Human Human":** AI ทำหน้าที่เป็นสมองภายนอกและคู่คิด ไม่แย่งการตัดสินใจไปจากมนุษย์ ช่วยลดภาระทางสมอง (Cognitive Load)
+* **กฎเหล็ก "Nothing is Deleted":** ความรู้และบทเรียนมีค่าสูง ไม่มีการลบทิ้ง ย้ายงานที่เสร็จแล้วเข้า `~/ψ/archive/` อย่างเป็นระเบียบ
+* **6 คำสั่งวงจรชีวิตหลัก (Master Commands):**
+  - `🌅 /standup`: เริ่มต้นวันอย่างมีทิศทาง ตรวจ `~/ψ/inbox/handoff/` และสรุป 3 Priority สำคัญพร้อมก้าวแรก
+  - `📖 /learn <target>`: สกัดแผนผัง สถาปัตยกรรม และจุดเสี่ยงจาก Codebase เข้าสู่ `~/ψ/learn/<target>/`
+  - `🌇 /rrr`: Review, Reflect, Reset ทบทวนงานปิดวัน และเซฟความจำระยะยาวลง `~/ψ/memory/retrospectives/`
+  - `🔄 /forward`: สร้าง Handoff Document บันทึกสถานะและคำสั่งถัดไปลง `~/ψ/inbox/handoff/` เพื่อเริ่มงานต่อได้ใน 1 วินาที
+  - `⏱️ /recap`: สรุปสถานะด่วนใน 3 บรรทัด (เป้าหมาย ➔ ทำแล้ว ➔ ค้างอยู่ ➔ ทางเลือกถัดไป)
+  - `🧘 /feel`: ปรับจังหวะช่วยเหลือตามระดับพลังงานและอารมณ์ของมนุษย์ ป้องกันการ Burnout
+* **คลังความรู้ถาวร 7 เลเยอร์ (`~/ψ`):** สร้างโฟลเดอร์สมองกลางอัตโนมัติ (`inbox/handoff`, `active`, `learn`, `memory`, `identity`, `trace`, `archive`) ไม่สูญหายแม้ปิดเทอร์มินัลหรือเปลี่ยนเครื่อง
+
 
 ---
 
