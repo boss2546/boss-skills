@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Wiki vs Obsidian — ถ้าเอามาแทนใน P.D.B จะเป็นยังไง</title>
+<style>
+  :root{
+    --bg:#0e0e10; --panel:#17171b; --panel2:#1e1e24; --line:#2c2c34;
+    --ink:#f4f4f6; --mut:#9a9aa6; --dim:#6c6c78;
+    --clean:#37c98b; --wiki:#c77dff; --obs:#5b8cff; --warn:#e0a23c; --red:#e0696c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,"Segoe UI","Sarabun",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+  section{padding:58px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:38px;line-height:1.25;font-weight:800;letter-spacing:-.5px}
+  h2{font-size:26px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+  h3{font-size:17px;font-weight:700;margin-bottom:4px}
+  .kick{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:14px}
+  .lead{font-size:18px;color:var(--mut);max-width:820px;margin-top:12px}
+  p{color:var(--mut)} .muted{color:var(--mut)} .dim{color:var(--dim)}
+  b{color:var(--ink)}
+  code,.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+  a{color:var(--wiki)}
+  /* hero */
+  .hero{padding:80px 0 56px;background:
+    radial-gradient(880px 360px at 80% -10%, rgba(199,125,255,.16), transparent 60%),
+    radial-gradient(680px 320px at 6% 0%, rgba(91,140,255,.13), transparent 60%)}
+  .badge{display:inline-flex;gap:10px;align-items:center;font-size:12.5px;font-weight:700;letter-spacing:1px;color:var(--mut);
+    border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:22px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--warn);display:inline-block}
+  .flow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:28px;font-size:14px;font-weight:600}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 13px}
+  .arrow{color:var(--dim);font-size:17px}
+  .c-obs{color:var(--obs)} .c-wiki{color:var(--wiki)} .c-clean{color:var(--clean)} .c-warn{color:var(--warn)}
+  /* grid + cards */
+  .grid{display:grid;gap:16px;margin-top:26px}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card.obs{border-top:3px solid var(--obs)} .card.wiki{border-top:3px solid var(--wiki)}
+  ul.clean{list-style:none;margin-top:8px}
+  ul.clean li{padding:6px 0 6px 24px;position:relative;color:var(--mut);font-size:15px}
+  ul.clean li::before{content:"";position:absolute;left:3px;top:14px;width:7px;height:7px;border-radius:50%;background:var(--dim)}
+  ul.clean li b{color:var(--ink)}
+  .yes li::before{background:var(--clean)} .no li::before{background:#7a3b3b} .wk li::before{background:var(--wiki)}
+  /* table */
+  table{width:100%;border-collapse:collapse;margin-top:24px;font-size:14.5px}
+  th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line)}
+  th.obs{color:var(--obs)} th.wiki{color:var(--wiki)}
+  td:first-child{color:var(--ink);font-weight:600;width:24%}
+  tbody tr:hover{background:var(--panel)}
+  .ok{color:var(--clean);font-weight:700} .nope{color:var(--red);font-weight:700} .part{color:var(--warn);font-weight:700}
+  /* highlight box */
+  .hibox{background:rgba(199,125,255,.06);border:1px solid rgba(199,125,255,.30);border-radius:16px;padding:26px}
+  .hibox.warn{background:rgba(224,162,60,.07);border-color:rgba(224,162,60,.32)}
+  .hibox h2{color:var(--wiki)} .hibox.warn h2{color:var(--warn)}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(199,125,255,.16);color:var(--wiki);margin-bottom:14px}
+  .pill.w{background:rgba(224,162,60,.16);color:var(--warn)}
+  /* pipeline */
+  .pipe{display:flex;flex-direction:column;margin-top:8px}
+  .stage{display:flex;align-items:flex-start;gap:16px}
+  .rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+  .node{width:15px;height:15px;border-radius:50%;border:2px solid var(--dim);background:var(--bg);margin-top:18px}
+  .node.obs{border-color:var(--obs)} .node.wiki{border-color:var(--wiki)} .node.clean{border-color:var(--clean)}
+  .vline{width:2px;flex:1;background:var(--line);min-height:26px}
+  .stbody{padding:8px 0 20px;flex:1}
+  .stbody .t{font-weight:700;font-size:16px}
+  .stbody .d{font-size:14px;color:var(--mut);margin-top:2px}
+  .out{display:inline-block;font-size:12px;font-family:"SF Mono",monospace;background:var(--panel);border:1px solid var(--line);
+    border-radius:6px;padding:2px 8px;margin:6px 6px 0 0;color:var(--ink)}
+  /* map rows */
+  .maprow{display:grid;grid-template-columns:1fr auto 1.3fr;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+  .maprow .from{color:var(--ink);font-weight:600;font-size:14.5px}
+  .maprow .mid{color:var(--dim)} .maprow .to{font-size:14px;color:var(--mut)}
+  .maprow .to b{color:var(--wiki)}
+  .stat{font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;margin-left:6px}
+  .stat.have{background:rgba(55,201,139,.15);color:var(--clean)}
+  .stat.partial{background:rgba(224,162,60,.15);color:var(--warn)}
+  .stat.no{background:rgba(224,105,108,.15);color:var(--red)}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-left:8px;vertical-align:middle}
+  .tag.gpl{background:rgba(224,105,108,.15);color:var(--red)}
+  pre{background:#0a0a0c;border:1px solid var(--line);border-radius:12px;padding:15px 18px;overflow-x:auto;
+    font-size:12.5px;line-height:1.7;color:#cdd2da;margin-top:14px;white-space:pre-wrap}
+  pre .c{color:var(--dim)} pre .k{color:var(--wiki)} pre .g{color:var(--clean)}
+  .verdict{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+  .vbox{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--panel)}
+  .vbox .h{font-weight:800;font-size:16px;margin-bottom:10px}
+  .vbox.now .h{color:var(--clean)} .vbox.prod .h{color:var(--warn)}
+  .foot{padding:38px 0 70px;color:var(--dim);font-size:13px;text-align:center}
+  @media(max-width:760px){.g2,.g3,.verdict{grid-template-columns:1fr}h1{font-size:28px}.lead{font-size:16px}
+    .maprow{grid-template-columns:1fr;gap:4px}.maprow .mid{display:none}td:first-child{width:auto}}
+</style>
+</head>
+<body>
+
+<!-- ░░ HERO ░░ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span> ศึกษา · สำหรับดูเอง · 13 มิ.ย. 2026</span>
+    <h1>LLM Wiki <span style="color:var(--dim);font-weight:600">vs</span> Obsidian<br>
+      <span style="font-size:23px;font-weight:700;color:var(--mut)">ถ้าเอามาแทน Obsidian ในระบบ P.D.B จะเป็นยังไง?</span></h1>
+    <p class="lead">สรุปจาก repo <code>nashsu/llm_wiki</code> จริง — <b>LLM Wiki คืออะไร · ต่างจาก Obsidian ตรงไหน ·
+      ถ้าเอามาแทนชั้นที่เราใช้ Obsidian อยู่ในตอนนี้ มันกลืนงานอะไรของ P.D.B ไปบ้าง และต้องระวังอะไร</b></p>
+    <div class="flow">
+      <span class="chip c-obs">🔵 Obsidian = คนเขียน/ดูเอง</span>
+      <span class="arrow">vs</span>
+      <span class="chip c-wiki">🟣 LLM Wiki = AI เขียน/ดูแลให้</span>
+    </div>
+    <p class="dim" style="margin-top:14px;font-size:14px">⚠️ ยึดหลัก "ห้ามมั่ว" — ทุกข้อในสไลด์อ้างจาก README/เอกสารของ repo จริง ส่วนที่เป็นความเห็น/คำแนะนำจะระบุไว้</p>
+  </div>
+</header>
+
+<!-- ░░ 1. LLM Wiki คืออะไร ░░ -->
+<section>
+  <div class="wrap">
+    <div class="kick">01 · ตั้งหลัก</div>
+    <h2>LLM Wiki คืออะไร (สั้น ๆ)</h2>
+    <p class="lead">แอป <b>เดสก์ท็อป</b> (Tauri/Rust + React) ที่ให้ <b class="c-wiki">LLM อ่านเอกสารของเรา → สร้างเป็น "วิกิ"
+      ที่เชื่อมโยงกัน → และคอยดูแลให้ทันสมัยเอง</b> ต่อยอดจากแพตเทิร์น "LLM Wiki" ของ Andrej Karpathy · License <b class="c-warn">GPL v3</b></p>
+    <div class="grid g3">
+      <div class="card">
+        <h3 class="c-clean">ต่างจาก RAG</h3>
+        <p style="font-size:14.5px">RAG ทั่วไป (NotebookLM/อัปไฟล์เข้า ChatGPT) ค้นใหม่ทุกครั้งที่ถาม ความรู้ไม่สะสม · LLM Wiki
+          <b>คอมไพล์ความรู้ครั้งเดียวแล้วเก็บไว้</b> วิกิรวยขึ้นเรื่อย ๆ</p>
+      </div>
+      <div class="card">
+        <h3 class="c-wiki">คนทำ vs AI ทำ</h3>
+        <p style="font-size:14.5px">เราดูแลแค่ <b>หาแหล่ง + ตั้งคำถาม</b> · LLM ทำงานน่าเบื่อทั้งหมด: สรุป จัดหมวด
+          ทำลิงก์ข้ามหน้า อัปเดต index/log</p>
+      </div>
+      <div class="card">
+        <h3 class="c-obs">จุดสำคัญที่สุด</h3>
+        <p style="font-size:14.5px">วิกิที่มันสร้าง = <b>โฟลเดอร์ Markdown ที่เปิดใน Obsidian ได้เลย</b>
+          (มันสร้าง <code>.obsidian/</code> ให้อัตโนมัติ) → นี่คือกุญแจของคำถามวันนี้</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 2. หัวใจ: ไม่ใช่คู่แข่งตรง ๆ ░░ -->
+<section>
+  <div class="wrap">
+    <div class="hibox">
+      <span class="pill">เก็ตอันนี้ก่อน เดี๋ยวไม่งง</span>
+      <h2>LLM Wiki ไม่ใช่ "Obsidian เวอร์ชันมี AI" — มันอยู่คนละชั้น</h2>
+      <p style="margin-top:10px;max-width:820px">ทั้งคู่ทำงานกับ "โฟลเดอร์ไฟล์ <code>.md</code> + <code>[[wikilink]]</code>" เหมือนกัน
+        แต่หน้าที่ต่างกันคนละเลเยอร์:</p>
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card obs">
+          <h3 class="c-obs">🔵 Obsidian = ชั้น "ดู / แก้"</h3>
+          <ul class="clean">
+            <li><b>คนเป็นคนเขียน</b>โน้ตเอง (หรือเขียนผ่านโค้ด/ปลั๊กอิน)</li>
+            <li>เก่งเรื่อง: เปิด/แก้ Markdown, กราฟลิงก์, ปลั๊กอินเพียบ</li>
+            <li><b>ไม่มี AI สร้าง/ดูแลเนื้อหาในตัว</b> — ต้องลงปลั๊กอินหรือเขียนเองต่อ</li>
+            <li>เป็น "สมุด + โต๊ะอ่าน" ไม่ใช่ "บรรณารักษ์"</li>
+          </ul>
+        </div>
+        <div class="card wiki">
+          <h3 class="c-wiki">🟣 LLM Wiki = ชั้น "บรรณารักษ์ AI"</h3>
+          <ul class="clean wk">
+            <li><b>AI เป็นคนเขียน/ดูแล</b>เนื้อหาให้ทั้งหมด</li>
+            <li>มาพร้อม: ingest อัตโนมัติ, กราฟวิเคราะห์, ค้นหา, แชทถาม-ตอบ, MCP/API</li>
+            <li><b>มี UI ของตัวเอง</b> (3 คอลัมน์ + Milkdown editor + preview) → <b>ไม่ต้องมี Obsidian ก็ทำงานได้</b></li>
+            <li>output ยังเป็น vault ที่ Obsidian เปิดได้ → ใช้คู่กันก็ได้</li>
+          </ul>
+        </div>
+      </div>
+      <p class="dim" style="margin-top:18px;font-size:14px">👉 แปลว่า "เอา LLM Wiki มาแทน Obsidian" จริง ๆ แล้วมันไม่ได้แทนแค่ตัวเปิดดู —
+        มันมาแทน <b class="c-wiki">ทั้งบรรณารักษ์ AI ที่ P.D.B กำลังเขียนเองอยู่</b>ด้วย (เดี๋ยวดูสไลด์ 05)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 3. ตารางเทียบ ░░ -->
+<section>
+  <div class="wrap">
+    <div class="kick">03 · เทียบกันชัด ๆ</div>
+    <h2>Obsidian vs LLM Wiki</h2>
+    <table>
+      <thead>
+        <tr><th>ความสามารถ</th><th class="obs">Obsidian</th><th class="wiki">LLM Wiki</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ใครเขียนเนื้อหา</td><td>คน (หรือโค้ดเราเอง)</td><td><b class="c-wiki">LLM เขียน/อัปเดตให้</b> (two-step ingest)</td></tr>
+        <tr><td>ดูแลให้ทันสมัย / ลิงก์ข้ามหน้า</td><td>ทำเอง</td><td><span class="ok">อัตโนมัติ</span> + อัปเดต index/log/overview</td></tr>
+        <tr><td>กราฟความสัมพันธ์</td><td>มี (กราฟลิงก์ตรง ๆ)</td><td><span class="ok">กราฟ + ถ่วงน้ำหนัก 4 สัญญาณ + จับกลุ่ม Louvain + ชี้ "ช่องว่างความรู้"</span></td></tr>
+        <tr><td>ค้นหา</td><td>คีย์เวิร์ด + ปลั๊กอิน</td><td>คีย์เวิร์ด + <b>vector (LanceDB, ทางเลือก)</b> + ขยายผลผ่านกราฟ</td></tr>
+        <tr><td>แชทถาม-ตอบกับคลังเอง</td><td><span class="nope">ไม่มีในตัว</span> (ต้องปลั๊กอิน)</td><td><span class="ok">มี</span> หลายห้องแชท + อ้างอิงหน้าที่ใช้</td></tr>
+        <tr><td>หาข้อมูลเพิ่มจากเว็บ</td><td><span class="nope">ไม่มี</span></td><td>Deep Research (Tavily/SerpApi/SearXNG) แล้ว ingest กลับ</td></tr>
+        <tr><td>เปิดให้ AI ภายนอกถอนข้อมูล (MCP/API)</td><td><span class="nope">ไม่มีในตัว</span></td><td><b class="c-wiki">มี HTTP API ในเครื่อง + agent skill</b> (<code>npx skills add</code>)</td></tr>
+        <tr><td>นำเข้าไฟล์หลายฟอร์แมต</td><td>นำเข้า .md เป็นหลัก</td><td>PDF/DOCX/PPTX/XLSX/รูป → Markdown อัตโนมัติ</td></tr>
+        <tr><td>ปลั๊กอิน / ยืดหยุ่นปรับแต่ง</td><td><span class="ok">ระบบปลั๊กอินมหาศาล</span></td><td>เป็นแอปสำเร็จรูป ปรับลึกต้องแก้ซอร์ส (Rust/React)</td></tr>
+        <tr><td>ทำงาน 100% ในเครื่อง</td><td><span class="ok">ใช่</span> (ไฟล์ local ล้วน)</td><td><span class="part">ได้ถ้าตั้ง Ollama</span> — แต่ค่าเริ่มต้นยิง LLM/เว็บขึ้นคลาวด์</td></tr>
+        <tr><td>ไลเซนส์ / ราคา</td><td>ฟรีสำหรับใช้ส่วนตัว (มีใบอนุญาตเชิงพาณิชย์)</td><td><b class="c-warn">GPL v3</b> (copyleft — สำคัญถ้าจะขาย)</td></tr>
+        <tr><td>สกัด "วิธีตัดสินใจ/Decision DNA"</td><td><span class="nope">ไม่ทำ</span></td><td><span class="nope">ไม่ทำ</span> — เป็นวิกิทั่วไป ไม่ใช่ Twin engine</td></tr>
+      </tbody>
+    </table>
+    <p class="dim" style="margin-top:14px;font-size:13.5px">หมายเหตุ: Obsidian เพิ่ม AI ได้ผ่านปลั๊กอิน/เขียนเองต่อ (ซึ่ง P.D.B ก็ทำแบบนั้นอยู่) — ตารางนี้เทียบ "ของในตัว"</p>
+  </div>
+</section>
+
+<!-- ░░ 4. P.D.B ใช้ Obsidian ตอนนี้ยังไง ░░ -->
+<section>
+  <div class="wrap">
+    <div class="kick">04 · จุดตั้งต้น</div>
+    <h2>ตอนนี้ P.D.B ใช้ Obsidian ยังไง</h2>
+    <p class="lead">ในระบบปัจจุบัน Obsidian ทำหน้าที่แค่ <b>"ตู้เซฟ + โต๊ะอ่าน"</b> ส่วน "บรรณารักษ์ AI" คือ
+      <b>โค้ด Node ที่เราเขียนเอง</b></p>
+    <div class="pipe" style="margin-top:24px">
+      <div class="stage"><div class="rail"><div class="node obs"></div><div class="vline"></div></div>
+        <div class="stbody"><div class="t c-obs">PassiveINKEY → ไฟล์ดิบ</div>
+          <div class="d">capture เสียง+จอ ถอดเป็นข้อความ ลง <code>raw/</code> (อ่านอย่างเดียว)</div></div></div>
+      <div class="stage"><div class="rail"><div class="node clean"></div><div class="vline"></div></div>
+        <div class="stbody"><div class="t c-clean">โค้ด P.D.B = บรรณารักษ์</div>
+          <div class="d">โค้ดที่เราเขียนเองทำงาน: <code>clean.js</code> ล้าง lossless → <code>analyze.js</code> วิเคราะห์ด้วย AI → <code>write-obsidian.js</code> เขียนโน้ต</div>
+          <span class="out">tools/digest.js</span><span class="out">lib/storage.js</span></div></div>
+      <div class="stage"><div class="rail"><div class="node obs"></div></div>
+        <div class="stbody"><div class="t c-obs">vault/ = Obsidian</div>
+          <div class="d">โน้ต Markdown + <code>.obsidian/</code> · เราเปิด Obsidian เพื่อ <b>อ่าน/ดูกราฟ</b> เท่านั้น</div></div></div>
+    </div>
+    <p class="dim" style="margin-top:8px;font-size:14px">สรุป: วันนี้ Obsidian = แค่ปลายทางสำหรับ "ดู" · งานหนัก (curate) เราเขียนเองใน <code>lib/</code></p>
+  </div>
+</section>
+
+<!-- ░░ 5. ถ้าแทนด้วย LLM Wiki ░░ -->
+<section>
+  <div class="wrap">
+    <div class="kick">05 · คำถามหลัก</div>
+    <h2>ถ้าเอา LLM Wiki มาแทน Obsidian ใน P.D.B</h2>
+    <div class="hibox" style="margin-top:14px">
+      <p style="max-width:840px"><b class="c-wiki">เซอร์ไพรส์:</b> มันไม่ได้แทนแค่ Obsidian (ชั้นดู) — เพราะ LLM Wiki
+        มีบรรณารักษ์ AI + กราฟ + ค้น + MCP มาในตัว มัน <b>กลืนงานหลายซับระบบที่ P.D.B วางโรดแมปจะสร้างเอง</b>
+        ไปเลย พูดง่าย ๆ คือ <b class="c-wiki">LLM Wiki ≈ ต้นแบบของซับระบบ 2–5 ที่ "สร้างเสร็จแล้ว"</b></p>
+      <div style="margin-top:20px">
+        <div class="maprow"><div class="from">#1 ช่องรับฝาก (Ingestion)</div><div class="mid">→</div>
+          <div class="to">Folder auto-watch: PassiveINKEY เขียนลง <code>raw/sources/</code> แล้วมัน <b>ดูดเข้าเอง</b> <span class="stat have">มีแล้ว</span></div></div>
+        <div class="maprow"><div class="from">#2 บรรณารักษ์ AI (Curator)</div><div class="mid">→</div>
+          <div class="to"><b>Two-step ingest</b> (วิเคราะห์ก่อน → ค่อยเขียน) + cache SHA256 <span class="stat have">มีแล้ว</span></div></div>
+        <div class="maprow"><div class="from">#3 ตู้เซฟ + สมุดบัญชี</div><div class="mid">→</div>
+          <div class="to">vault + <code>index.md</code> + <code>log.md</code> + <code>sources[]</code> ย้อนรอยได้ <span class="stat have">มีแล้ว</span></div></div>
+        <div class="maprow"><div class="from">#4 กราฟความสัมพันธ์</div><div class="mid">→</div>
+          <div class="to">กราฟ 4 สัญญาณ + Louvain + Graph Insights <b>(เหนือกว่ากราฟ Obsidian)</b> <span class="stat have">มีแล้ว</span></div></div>
+        <div class="maprow"><div class="from">#5 เคาน์เตอร์ถอน (MCP/API)</div><div class="mid">→</div>
+          <div class="to">HTTP API <code>127.0.0.1:19828</code> (token) + agent skill ต่อ Claude Code ได้ <span class="stat have">มีแล้ว</span></div></div>
+        <div class="maprow" style="border-bottom:none"><div class="from">#6 ยาม + กล้อง (Security/Audit)</div><div class="mid">→</div>
+          <div class="to">มี token + จำกัด <code>127.0.0.1</code> + ย้อนรอย sources — แต่ audit/consent เต็มยังไม่ถึง <span class="stat partial">บางส่วน</span></div></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:30px" class="c-wiki">ภาพ pipeline ใหม่ (ถ้าแทน)</h3>
+    <pre><span class="c"># เดิม</span>
+PassiveINKEY → raw/ → <span class="g">โค้ด P.D.B (clean/analyze/write)</span> → vault → เปิด Obsidian ดู
+
+<span class="c"># ถ้าแทนด้วย LLM Wiki</span>
+PassiveINKEY → raw/sources/ → <span class="k">[ LLM Wiki: ingest → วิกิ + กราฟ + ค้น + แชท + MCP ]</span>
+                                         └─ Obsidian เหลือเป็น <span class="c">"ตัวเลือกเปิดดู vault"</span> (ยังเปิดได้ เพราะ compatible)</pre>
+    <p class="dim" style="margin-top:10px;font-size:14px">โค้ด <code>analyze.js</code>/<code>write-obsidian.js</code> ที่เราเขียน จะถูก LLM Wiki แทน — ไม่ใช่แค่ Obsidian</p>
+  </div>
+</section>
+
+<!-- ░░ 6. ข้อควรระวัง ░░ -->
+<section>
+  <div class="wrap">
+    <div class="hibox warn">
+      <span class="pill w">ห้ามมั่ว — บอกตรง ๆ ก่อนตัดสินใจ</span>
+      <h2>5 จุดที่ต้องชั่งใจ</h2>
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card">
+          <h3 class="c-warn">1. GPL v3 <span class="tag gpl">copyleft</span></h3>
+          <p style="font-size:14.5px">ใช้ <b>ส่วนตัว/ภายใน/prototype</b> = สบายมาก · แต่ถ้าจะเอาโค้ดมันมายำเป็น
+            <b>product เชิงพาณิชย์ที่แจกจ่าย</b> GPL บังคับให้เปิดซอร์สตาม — ชนกับแผนขาย B2B SaaS</p>
+        </div>
+        <div class="card">
+          <h3 class="c-warn">2. invariant "ในเครื่อง 100%"</h3>
+          <p style="font-size:14.5px">ค่าเริ่มต้นมันยิง LLM + web search ขึ้นคลาวด์ · จะให้ local จริงต้องตั้ง
+            <b>Ollama</b> + ปิด Deep Research · vector (LanceDB) local อยู่แล้ว · ฟีเจอร์ค้นเว็บจะหายไป</p>
+        </div>
+        <div class="card">
+          <h3 class="c-warn">3. invariant "lossless"</h3>
+          <p style="font-size:14.5px"><code>raw/</code> มัน immutable (ดี) · แต่มันเน้น <b>สรุป/เขียนทับหน้า</b> และมี cascade delete —
+            ไม่ได้เก็บ "ข้อความสะอาดฉบับเต็ม + log การตัด" แบบที่บอสสั่ง ต้องเสริมเองหรือยอมรับว่าต่าง spec</p>
+        </div>
+        <div class="card">
+          <h3 class="c-warn">4. สิ่งที่มัน "ไม่ทำ"</h3>
+          <p style="font-size:14.5px">ไม่มี <b>Decision Matrix 7 มิติ / Psychometric / Twin / Avatar</b> — มันคือวิกิทั่วไป
+            แทนได้แค่ชั้น <b>Vault + curate + graph + MCP</b> ไม่ใช่ตัวต่างของบริษัท</p>
+        </div>
+        <div class="card" style="grid-column:1/-1">
+          <h3 class="c-warn">5. ควบคุม/ปรับแต่งได้น้อยลง</h3>
+          <p style="font-size:14.5px">เป็นแอปแพ็กสำเร็จ (Tauri/Rust/React) — อยาก custom logic ของธนาคารข้อมูล (เช่น consent envelope, audit แบบเรา)
+            ต้องไปแก้ซอร์สมัน ซึ่งยากและผูกกับ GPL · ต่างจากโค้ด Node ของเราที่คุมเองได้ 100% และคือสิ่งที่จะกลายเป็น product จริง</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 7. สรุป ░░ -->
+<section style="border-bottom:none">
+  <div class="wrap">
+    <div class="kick">07 · สรุป (ความเห็น)</div>
+    <h2>แล้วควรทำไง</h2>
+    <p class="lead">คำตอบไม่ใช่ "แทน" หรือ "ไม่แทน" ขาว-ดำ — แต่แยกตาม <b>"ดูเอง/ตอนนี้"</b> กับ <b>"product บริษัท"</b></p>
+    <div class="verdict">
+      <div class="vbox now">
+        <div class="h">✓ สำหรับดูเอง / prototype เดี๋ยวนี้</div>
+        <ul class="clean yes">
+          <li>ลง LLM Wiki <b>ชี้ที่ vault ของ P.D.B</b> + ตั้ง Ollama ให้ local</li>
+          <li>จะได้เห็น <b>ปลายทางของระบบ</b> (graph + ค้น + MCP) ทำงานจริงทันที = แผนที่ว่าโตเต็มหน้าตาเป็นไง</li>
+          <li><b>ขโมยไอเดียได้เพียบ</b>: two-step ingest, <code>sources[]</code> traceability, กราฟ 4 สัญญาณ, schema API</li>
+          <li>คุ้มมากในฐานะ "ของอ้างอิง" — ไม่ต้องเขียนเองเพื่อจะรู้ว่าอะไรเวิร์ก</li>
+        </ul>
+      </div>
+      <div class="vbox prod">
+        <div class="h">⚠ สำหรับ product ของบริษัท</div>
+        <ul class="clean no">
+          <li><b>อย่าเอาโค้ดมันมาใช้ตรง ๆ</b> — GPL v3 ผูกมัดของที่จะขาย</li>
+          <li>ให้ <b>reimplement ไอเดียเด็ด</b> ในโค้ด Node ของ P.D.B เอง (คุม lossless/consent/audit ได้ตามค่านิยมบริษัท)</li>
+          <li><b>เก็บ Obsidian ไว้</b>ในฐานะ "ตัวเปิดดู vault" — ไม่ต้องทิ้ง เพราะ vault ยัง compatible</li>
+          <li>LLM Wiki แทนได้แค่ชั้น Vault — <b>Decision Matrix / Twin ยังต้องสร้างเอง</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hibox" style="margin-top:24px">
+      <p style="max-width:860px"><b class="c-wiki">บรรทัดเดียว:</b> LLM Wiki คือ "P.D.B subsystem 2–5 ที่มีคนสร้างเสร็จแล้วแบบ open-source"
+        — <b>ใช้เป็นแผนที่ + แหล่งขโมยไอเดีย + เครื่องเดโมตอนนี้ได้เลย</b> แต่เพราะ GPL + ทำ local เต็มไม่ได้ + ไม่มี Decision Matrix
+        จึง <b>ไม่ควรเป็นตัว product สุดท้าย</b> ของบริษัท</p>
+    </div>
+  </div>
+</section>
+
+<div class="foot">
+  ศึกษาจาก github.com/nashsu/llm_wiki (README + llm-wiki.md) · ทำสำหรับ P.D.B · 13 มิ.ย. 2026 ·
+  <span class="dim">ข้อเท็จจริงอ้างจาก repo จริง · ส่วนคำแนะนำเป็นความเห็นจากบริบทโปรเจกต์</span>
+</div>
+
+</body>
+</html>

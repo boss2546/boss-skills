@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สรุปแผนทั้งหมด — เราอยู่ตรงไหน</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#fff; --ink:#2b2b30; --mut:#6a6a74; --line:#ece8e1;
+    --cap:#3b82f6; --pdb:#8b5cf6; --wiki:#ec4899; --good:#10b981; --good-bg:#e7f7f0;
+    --todo:#f59e0b; --todo-bg:#fdf3e1; --accent:#8b5cf6; --accent-bg:#f3effe;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:17.5px}
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px}
+  section{padding:38px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:36px;line-height:1.2;font-weight:800;text-align:center;letter-spacing:-.5px}
+  h2{font-size:24px;font-weight:800;display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .sub{color:var(--mut);font-size:18px;text-align:center;margin-top:8px}
+  p{color:var(--mut)} b{color:var(--ink)}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.85em;background:#f1eee8;padding:1px 6px;border-radius:5px;color:#5a4a8a}
+  .hero{padding:54px 0 24px;text-align:center}
+  .tag{display:inline-block;font-size:15px;font-weight:700;color:var(--good);background:var(--good-bg);border-radius:999px;padding:8px 20px;margin-bottom:16px}
+  /* pipeline */
+  .pipe{display:flex;gap:10px;align-items:stretch;margin-top:18px;flex-wrap:wrap}
+  .pb{flex:1;min-width:150px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center;border-top:4px solid var(--line)}
+  .pb.cap{border-top-color:var(--cap)} .pb.pdb{border-top-color:var(--pdb)} .pb.wiki{border-top-color:var(--wiki)}
+  .pb .em{font-size:30px} .pb .nm{font-weight:800;font-size:16px;margin-top:3px}
+  .pb.cap .nm{color:var(--cap)} .pb.pdb .nm{color:var(--pdb)} .pb.wiki .nm{color:var(--wiki)}
+  .pb .d{font-size:13.5px;color:var(--mut);margin-top:3px}
+  .pa{display:flex;align-items:center;font-size:24px;color:#c9c5bd;font-weight:800}
+  /* rule box */
+  .rule{background:var(--accent-bg);border:1px solid #e3d9fb;border-radius:16px;padding:18px 22px;margin-top:14px}
+  .rule h3{font-size:16.5px;font-weight:800;color:var(--accent);margin-bottom:6px}
+  .rule ul{list-style:none}
+  .rule li{font-size:15.5px;color:var(--ink);padding:5px 0 5px 24px;position:relative}
+  .rule li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:800}
+  /* checklists */
+  .lst{margin-top:8px}
+  .li{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 18px;margin-bottom:10px}
+  .li .mk{flex:0 0 auto;font-size:20px;line-height:1.4}
+  .li.done{border-left:4px solid var(--good)}
+  .li.todo{border-left:4px solid var(--todo)}
+  .li .tx{font-size:16px}
+  .li .tx b{color:var(--ink)}
+  .li .num{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--todo-bg);color:var(--todo);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .final{background:var(--ink);color:#fff;border-radius:20px;padding:26px 28px;text-align:center}
+  .final p{color:#cfcfd6;font-size:18px;margin:0}
+  .final .hl{color:#93c5fd;font-weight:700}
+  .docnote{font-size:14px;color:var(--mut);text-align:center;margin-top:14px}
+  .foot{padding:26px 0 56px;color:#aaa;font-size:13.5px;text-align:center}
+  @media(max-width:680px){.pipe{flex-direction:column}.pa{transform:rotate(90deg);justify-content:center}h1{font-size:28px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">✅ มีแผนชัดแล้ว · 14 มิ.ย. 2026</span>
+    <h1>เราอยู่ตรงไหน + แผนคืออะไร</h1>
+    <p class="sub">ออกแบบเสร็จแล้ว · กำลังจะลงมือสร้างส่วน "ม้วนสรุป"</p>
+  </div>
+</header>
+
+<!-- THE PLAN: architecture -->
+<section>
+  <div class="wrap">
+    <h2>🗺️ แผน (1): ระบบ 3 ตัวต่อกัน</h2>
+    <div class="pipe">
+      <div class="pb cap"><div class="em">🎙️</div><div class="nm">PassiveINKEY</div><div class="d">อัดเสียง+จอ ถอดเป็นข้อความ</div></div>
+      <div class="pa">→</div>
+      <div class="pb pdb"><div class="em">🏦</div><div class="nm">P.D.B</div><div class="d">ล้าง + สรุป + ม้วนซ้อนชั้น</div></div>
+      <div class="pa">→</div>
+      <div class="pb wiki"><div class="em">📚</div><div class="nm">LLM Wiki</div><div class="d">เก็บ + ค้น + กราฟ + ถาม</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- THE PLAN: data rule -->
+<section>
+  <div class="wrap">
+    <h2>📐 แผน (2): กฎจัดการข้อมูล</h2>
+    <div class="rule">
+      <h3>หัวใจ 4 ข้อ</h3>
+      <ul>
+        <li><b>ไม่ป้อนดิบทุกไฟล์</b> (firehose = 564 หน้า/วัน ไม่รอด) — ป้อน "สรุป" แทน</li>
+        <li><b>สรุปซ้อนชั้นตามเวลา</b> — วัน → สัปดาห์ → เดือน → ปี (หดสั้นลงทุกชั้น)</li>
+        <li><b>เสียง+จอ จับคู่ด้วยเวลา</b> — เรียงไทม์ไลน์เดียว เป็นก้อนเดียว</li>
+        <li><b>ของดิบเก็บไว้ตลอด</b> — กดกลับไปดูต้นทางได้ (ไม่หาย)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DONE -->
+<section>
+  <div class="wrap">
+    <h2>✅ ทำไปแล้ว</h2>
+    <div class="lst">
+      <div class="li done"><span class="mk">✅</span><span class="tx"><b>LLM Wiki</b> — build จากซอร์ส + รันได้ + แชทไทยได้ (มีโปรเจกต์ BOSS)</span></div>
+      <div class="li done"><span class="mk">✅</span><span class="tx"><b>เพิ่มโค้ดล้างคำซ้ำ</b> ใน LLM Wiki + เทส 6/6 ผ่าน + push ขึ้น GitHub (boss2546/pdb-llm-wiki)</span></div>
+      <div class="li done"><span class="mk">✅</span><span class="tx"><b>P.D.B สรุปวัน (digest)</b> — มีอยู่แล้ว = ชั้นล่างสุดของการม้วน</span></div>
+      <div class="li done"><span class="mk">✅</span><span class="tx"><b>ตั้ง Scheduled Import</b> + ทดลองป้อนดิบ → เห็นปัญหา 564 หน้า (ยืนยันว่าต้องสรุป)</span></div>
+      <div class="li done"><span class="mk">✅</span><span class="tx"><b>ออกแบบครบ</b> — เอกสาร ~14 ไฟล์ (เทียบ Obsidian, จัดการข้อมูล, สรุปซ้อนชั้น, จับคู่เสียง×จอ ฯลฯ)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TODO -->
+<section>
+  <div class="wrap">
+    <h2>🔨 เหลือทำ (ลงมือสร้าง)</h2>
+    <div class="lst">
+      <div class="li todo"><span class="num">1</span><span class="tx"><b>ฟังก์ชัน "ม้วน" (rollup) ใน P.D.B</b> — สรุปสัปดาห์ / เดือน / ปี (ต่อจาก digest เดิม)</span></div>
+      <div class="li todo"><span class="num">2</span><span class="tx"><b>เพิ่ม timestamp ใน PassiveINKEY</b> — ให้จับคู่เสียง+จอตามเวลาได้ (มีข้อมูลอยู่แล้ว แค่เขียนออกมา)</span></div>
+      <div class="li todo"><span class="num">3</span><span class="tx"><b>เปลี่ยน Scheduled Import</b> — จากชี้ <code>recordings</code> (ดิบ) → ชี้ <code>digests/</code> (สรุป)</span></div>
+      <div class="li todo"><span class="num">4</span><span class="tx"><b>เก็บกวาด BOSS เดิม</b> — 564 หน้าจากการทดลอง (ลบ/เริ่มโปรเจกต์ใหม่สะอาด)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHERE -->
+<section style="border-bottom:none">
+  <div class="wrap">
+    <div class="final">
+      <p>📍 เราอยู่ตรงนี้: <span class="hl">ออกแบบเสร็จ 100% · โค้ดพื้นฐานทำแล้ว</span><br>ขั้นต่อไป = ลงมือเขียน <span class="hl">"ฟังก์ชันม้วนสรุป"</span> (ข้อ 1)</p>
+    </div>
+    <p class="docnote">📂 รายละเอียดทั้งหมดอยู่ในโฟลเดอร์ <code>P.D.B/docs/</code> (~14 ไฟล์) · ไฟล์นี้คือ "แผนที่รวม" ที่กลับมาดูได้เสมอ</p>
+  </div>
+</section>
+
+<div class="foot">สรุปแผนทั้งหมด · PassiveINKEY × P.D.B × LLM Wiki · 14 มิ.ย. 2026</div>
+
+</body>
+</html>

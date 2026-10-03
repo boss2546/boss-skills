@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ไดอารี่ที่หดได้ — แบบเด็ก ๆ เข้าใจ</title>
+<style>
+  :root{
+    --bg:#fff9f0; --card:#fff; --ink:#33312e; --mut:#76726b; --line:#f0e7d8;
+    --day:#3b82f6; --week:#8b5cf6; --month:#ec4899; --year:#f59e0b; --good:#10b981; --accent:#f59e0b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85;font-size:19px}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  section{padding:38px 0}
+  h1{font-size:38px;line-height:1.2;font-weight:800;text-align:center;letter-spacing:-.5px}
+  h2{font-size:26px;font-weight:800;text-align:center;margin-bottom:6px}
+  .sub{color:var(--mut);font-size:20px;text-align:center;margin-top:8px}
+  p{color:var(--mut)} b{color:var(--ink)}
+  .hero{padding:56px 0 20px;text-align:center}
+  .tag{display:inline-block;font-size:15px;font-weight:700;color:var(--accent);background:#fdf0d8;border-radius:999px;padding:8px 20px;margin-bottom:18px}
+  .big{background:var(--card);border:3px solid var(--accent);border-radius:24px;padding:26px;margin-top:10px;font-size:22px;font-weight:700;text-align:center;color:var(--ink)}
+  .big .em{font-size:50px;display:block;margin-bottom:8px}
+  .big .hl{color:var(--accent)}
+  /* shrinking story */
+  .story{margin-top:14px}
+  .lvl{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px 22px;margin-bottom:14px;display:flex;gap:16px;align-items:center}
+  .lvl .ic{flex:0 0 auto;font-size:34px}
+  .lvl .body .when{font-weight:800;font-size:17px;margin-bottom:2px}
+  .lvl .body .what{color:var(--ink)}
+  .lvl.d{border-color:#bcd6fb} .lvl.d .when{color:var(--day)}
+  .lvl.w{border-color:#dbcdf8} .lvl.w .when{color:var(--week)}
+  .lvl.m{border-color:#f8cce2} .lvl.m .when{color:var(--month)}
+  .lvl.y{border-color:#f8e0b0} .lvl.y .when{color:var(--year)}
+  .lvl.d .what{font-size:17px} .lvl.w .what{font-size:18px} .lvl.m .what{font-size:19px;font-weight:600} .lvl.y .what{font-size:21px;font-weight:700}
+  .arr{text-align:center;font-size:22px;color:#d8cdb8;margin:-4px 0 8px}
+  .arr small{font-size:14px;color:var(--mut);display:block}
+  /* cycle */
+  .cycle{background:#eef9f2;border:2px solid #c5ead7;border-radius:20px;padding:22px 24px;text-align:center;font-size:19px;color:var(--ink)}
+  .cycle .em{font-size:36px}
+  .cycle b{color:var(--good)}
+  /* shelf */
+  .shelf{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:24px;text-align:center}
+  .shelf .em{font-size:48px}
+  .ask{background:#f3effe;border-radius:16px;padding:14px 18px;margin-top:14px;font-size:18px}
+  .ask .q{font-weight:800;color:var(--week)}
+  /* why */
+  .why{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  .wc{border-radius:18px;padding:18px 20px;text-align:center}
+  .wc.bad{background:#fdecec;border:2px solid #f6c9c9}
+  .wc.good{background:#e7f7f0;border:2px solid #c2ecd9}
+  .wc .em{font-size:34px}
+  .wc .t{font-weight:800;font-size:17px;margin:4px 0}
+  .wc.bad .t{color:#ef4444} .wc.good .t{color:var(--good)}
+  .wc p{font-size:15px}
+  .foot{padding:26px 0 56px;color:#bbb;font-size:14px;text-align:center}
+  @media(max-width:640px){.why{grid-template-columns:1fr}h1{font-size:30px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">แบบเด็ก ๆ ก็เข้าใจ · เน้นตัวอย่าง</span>
+    <h1>ไดอารี่ที่ "หดได้" 📔</h1>
+    <div class="big">
+      <span class="em">📔</span>
+      ทุกคืนเขียน <span class="hl">"วันนี้มีอะไร"</span> 1 หน้า · พอเรื่องเก่าลง ก็ <span class="hl">หดให้สั้นลง</span>
+    </div>
+  </div>
+</header>
+
+<!-- SHRINKING STORY -->
+<section style="padding-top:8px">
+  <div class="wrap">
+    <h2>📏 เรื่องเดียวกัน หดสั้นลงเรื่อย ๆ</h2>
+    <p class="sub" style="margin-bottom:18px">ดูเรื่อง "ไปขายของที่อินเดีย" ของจริงเลย 👇</p>
+    <div class="story">
+      <div class="lvl d"><div class="ic">📄</div><div class="body">
+        <div class="when">วันนี้ (เต็ม)</div>
+        <div class="what">"วันนี้คุยกับพี่จากอินเดีย เรื่องพาบริษัทไปขายที่อินเดีย เขามีโครงการช่วย 6 เดือน อยากชวนพี่ทูชาร์มาคุยต่อ แล้วก็ลองติดต่อ JETRO ด้วย"</div>
+      </div></div>
+      <div class="arr">▼ <small>ครบ 7 วัน หดเป็น...</small></div>
+      <div class="lvl w"><div class="ic">📑</div><div class="body">
+        <div class="when">อาทิตย์นี้</div>
+        <div class="what">"เริ่มคุยเรื่องไปขายของที่อินเดีย"</div>
+      </div></div>
+      <div class="arr">▼ <small>ครบเดือน หดอีก...</small></div>
+      <div class="lvl m"><div class="ic">📚</div><div class="body">
+        <div class="when">เดือนนี้</div>
+        <div class="what">"เริ่มมองตลาดเมืองนอก"</div>
+      </div></div>
+      <div class="arr">▼ <small>ครบปี เหลือสั้นสุด...</small></div>
+      <div class="lvl y"><div class="ic">🗂️</div><div class="body">
+        <div class="when">ปีนี้</div>
+        <div class="what">"ปีที่เริ่มขยายไปต่างประเทศ"</div>
+      </div></div>
+    </div>
+    <p class="sub" style="font-size:17px;margin-top:14px">เรื่องเดียวกันเป๊ะ — แค่<b>หดสั้นลง</b>ทุกชั้น 🎈</p>
+  </div>
+</section>
+
+<!-- CYCLE -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <h2>🔁 แล้วก็เริ่มใหม่</h2>
+    <div class="cycle">
+      <span class="em">🌙</span>
+      <p style="color:var(--ink)">ทุกอย่าง<b>เริ่มที่ "วัน" เสมอ</b> — เขียนวันใหม่ทุกคืน · พอครบอาทิตย์ก็หดที · ครบเดือนก็หดที · <b>แล้ววนแบบนี้ไปเรื่อย ๆ</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- SHELF / LLM WIKI -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <h2>📚 เก็บไว้บน "ชั้นหนังสือ"</h2>
+    <p class="sub" style="margin-bottom:16px">ทุกหน้าสรุปไปวางบนชั้น = <b style="color:var(--ink)">LLM Wiki</b> (แอปที่เราทำ)</p>
+    <div class="shelf">
+      <span class="em">📚🔍</span>
+      <p style="color:var(--ink)">บนชั้นนี้ <b>ถามอะไรก็ได้</b> มันหาให้ทันที + วาดเป็นแผนภาพว่าเรื่องไหนโยงเรื่องไหน</p>
+      <div class="ask"><span class="q">"เรื่องอินเดียว่าไงบ้าง?"</span> → มันดึงทุกหน้าที่เกี่ยวมาตอบให้เลย 🙌</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <h2>⭐ ทำไมต้องหด?</h2>
+    <div class="why">
+      <div class="wc bad"><span class="em">🗑️</span><div class="t">เก็บทุกคำ</div><p>กองโต รก หาไม่เจอ (วันละ 500 หน้า!)</p></div>
+      <div class="wc good"><span class="em">✨</span><div class="t">เก็บแบบหด</div><p>เป็นระเบียบ หาง่าย (วันละไม่กี่หน้า)</p></div>
+    </div>
+    <p class="sub" style="font-size:18px;margin-top:18px">สรุป: <b style="color:var(--ink)">เขียนวันสั้น ๆ → พอเก่าก็หด → วางบนชั้นให้ถามได้</b> 🎯</p>
+  </div>
+</section>
+
+<div class="foot">ไดอารี่ที่หดได้ · อธิบายแบบเด็ก ๆ · 14 มิ.ย. 2026</div>
+
+</body>
+</html>

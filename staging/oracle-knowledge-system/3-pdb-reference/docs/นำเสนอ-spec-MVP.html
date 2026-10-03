@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P.D.B · Spec MVP — Daily Digest → Obsidian</title>
+<style>
+  :root{
+    --bg:#0e0e10; --panel:#17171b; --panel2:#1e1e24; --line:#2c2c34;
+    --ink:#f4f4f6; --mut:#9a9aa6; --dim:#6c6c78;
+    --clean:#37c98b; --ai:#c77dff; --raw:#5b8cff; --warn:#e0a23c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,"Segoe UI","Sarabun",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+  section{padding:60px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:38px;line-height:1.25;font-weight:800;letter-spacing:-.5px}
+  h2{font-size:26px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+  h3{font-size:17px;font-weight:700;margin-bottom:4px}
+  .kick{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:14px}
+  .lead{font-size:18px;color:var(--mut);max-width:780px;margin-top:12px}
+  p{color:var(--mut)} .muted{color:var(--mut)} .dim{color:var(--dim)}
+  code,.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+  /* hero */
+  .hero{padding:84px 0 60px;background:
+    radial-gradient(880px 360px at 78% -10%, rgba(199,125,255,.15), transparent 60%),
+    radial-gradient(680px 320px at 8% 0%, rgba(55,201,139,.12), transparent 60%)}
+  .badge{display:inline-flex;gap:10px;align-items:center;font-size:12.5px;font-weight:700;letter-spacing:1px;color:var(--mut);
+    border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:22px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--warn);display:inline-block}
+  .flow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:28px;font-size:14px;font-weight:600}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 13px}
+  .arrow{color:var(--dim);font-size:17px}
+  .c-raw{color:var(--raw)} .c-clean{color:var(--clean)} .c-ai{color:var(--ai)}
+  /* grid + cards */
+  .grid{display:grid;gap:16px;margin-top:26px}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3 .n{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:7px;
+    background:var(--panel2);font-size:13px;margin-right:8px;color:var(--mut)}
+  ul.clean{list-style:none;margin-top:8px}
+  ul.clean li{padding:6px 0 6px 24px;position:relative;color:var(--mut);font-size:15px}
+  ul.clean li::before{content:"";position:absolute;left:3px;top:14px;width:7px;height:7px;border-radius:50%;background:var(--dim)}
+  ul.clean li b{color:var(--ink)}
+  .yes li::before{background:var(--clean)} .no li::before{background:#7a3b3b}
+  /* lossless highlight */
+  .hibox{background:rgba(224,162,60,.07);border:1px solid rgba(224,162,60,.32);border-radius:16px;padding:26px}
+  .hibox h2{color:var(--warn)}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(224,162,60,.16);color:var(--warn);margin-bottom:14px}
+  /* pipeline */
+  .pipe{display:flex;flex-direction:column;gap:0;margin-top:24px}
+  .stage{display:flex;align-items:flex-start;gap:16px}
+  .rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+  .node{width:15px;height:15px;border-radius:50%;border:2px solid var(--dim);background:var(--bg);margin-top:18px}
+  .node.raw{border-color:var(--raw)} .node.clean{border-color:var(--clean)} .node.ai{border-color:var(--ai)}
+  .vline{width:2px;flex:1;background:var(--line);min-height:30px}
+  .stbody{padding:8px 0 22px;flex:1}
+  .stbody .t{font-weight:700;font-size:16px}
+  .stbody .d{font-size:14px;color:var(--mut);margin-top:2px}
+  .out{display:inline-block;font-size:12px;font-family:"SF Mono",monospace;background:var(--panel);border:1px solid var(--line);
+    border-radius:6px;padding:2px 8px;margin:6px 6px 0 0;color:var(--ink)}
+  .out.full{border-color:rgba(55,201,139,.4)} .out.note{border-color:rgba(199,125,255,.4)}
+  pre{background:#0a0a0c;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow-x:auto;
+    font-size:12.5px;line-height:1.7;color:#cdd2da;margin-top:14px;white-space:pre-wrap}
+  pre .c{color:var(--dim)} pre .k{color:var(--ai)} pre .g{color:var(--clean)}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-left:8px;vertical-align:middle}
+  .tag.pure{background:rgba(55,201,139,.15);color:var(--clean)}
+  .tag.ait{background:rgba(199,125,255,.15);color:var(--ai)}
+  .tag.io{background:#26262e;color:var(--mut)}
+  .road{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .road span{font-size:13px;border:1px dashed var(--line);border-radius:8px;padding:7px 12px;color:var(--dim)}
+  .foot{padding:40px 0 70px;color:var(--dim);font-size:13px;text-align:center}
+  @media(max-width:760px){.g2,.g3,.g4{grid-template-columns:1fr 1fr}h1{font-size:29px}.lead{font-size:16px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span> SPEC · ร่างให้รีวิว · 13 มิ.ย. 2026</span>
+    <h1>Daily Digest → Obsidian<br><span style="font-size:24px;font-weight:700;color:var(--mut)">MVP แรกของ P.D.B (Personal Data Bank)</span></h1>
+    <p class="lead">แปลงข้อมูลดิบ 1 วันจาก PassiveINKEY → โน้ต Obsidian 1 ใบ/วัน ที่อ่านรู้เรื่อง สรุปประเด็น ลิงก์คน/โปรเจกต์ — <b style="color:var(--warn)">โดยไม่ทำข้อมูลจริงหาย</b></p>
+    <div class="flow">
+      <span class="chip c-raw">📥 ดิบ 1 วัน</span><span class="arrow">→</span>
+      <span class="chip c-clean">🧹 ล้าง (lossless)</span><span class="arrow">→</span>
+      <span class="chip c-ai">🤖 วิเคราะห์ AI</span><span class="arrow">→</span>
+      <span class="chip">📝 โน้ต Obsidian</span>
+    </div>
+    <p class="dim" style="margin-top:14px;font-size:14px">ซับระบบที่ 2 (Curator) ของธนาคาร: ฝากดิบ → พนักงานนับ/จัด → ลงบัญชีเป็นโน้ต</p>
+  </div>
+</header>
+
+<!-- ขอบเขต -->
+<section>
+  <div class="wrap">
+    <div class="kick">ขอบเขต · เฟสนี้ทำแค่ไหน</div>
+    <h2>เล็ก ครบลูป เทสได้ — ตัดส่วนซับซ้อนออกก่อน</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3 class="c-clean">✓ มีในเฟสนี้</h3>
+        <ul class="clean yes">
+          <li>อ่านดิบ <b>1 วัน</b> → ล้างแบบ lossless</li>
+          <li>วิเคราะห์ด้วย AI → เขียนโน้ต Obsidian</li>
+          <li>สั่งผ่าน <b>CLI ทีละวัน</b> (<code>node tools/digest.js &lt;วัน&gt;</code>)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:#c98686">✕ ยังไม่มี (YAGNI — เฟสถัดไป)</h3>
+        <ul class="clean no">
+          <li>ฐานข้อมูล · vector / semantic search</li>
+          <li>MCP · ถาม-ตอบ · realtime · หลายแหล่ง</li>
+          <li>security / audit เต็มรูปแบบ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- หลักการ lossless -->
+<section>
+  <div class="wrap">
+    <div class="hibox">
+      <span class="pill">หัวใจที่บอสสั่งย้ำ</span>
+      <h2>ล้างแบบไม่ทำข้อมูลหาย (Lossless)</h2>
+      <div class="grid g2" style="margin-top:18px">
+        <ul class="clean">
+          <li>ไฟล์ดิบ PassiveINKEY <b>อ่านอย่างเดียว ห้ามแก้/ลบ</b></li>
+          <li>เก็บ <b>ข้อความสะอาดฉบับเต็ม</b> เสมอ — โน้ตสรุปเป็นชั้นเสริม ไม่ใช่ตัวแทน</li>
+        </ul>
+        <ul class="clean">
+          <li>ตัดเฉพาะที่ <b>พิสูจน์ได้ว่าซ้ำ/noise</b> · ไม่ชัวร์ = เก็บไว้</li>
+          <li>ทุกอย่างที่ตัด บันทึกใน <b>removal log</b> ตรวจย้อนได้</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- data flow -->
+<section>
+  <div class="wrap">
+    <div class="kick">สถาปัตยกรรม · Data Flow</div>
+    <h2>ไหลเป็นเส้นเดียว ออกผล 3 ไฟล์/วัน</h2>
+    <div class="pipe">
+      <div class="stage">
+        <div class="rail"><div class="node raw"></div><div class="vline"></div></div>
+        <div class="stbody">
+          <div class="t c-raw">📥 source — PassiveINKEY <span class="tag io">อ่านอย่างเดียว</span></div>
+          <div class="d"><code>sourceDir/&lt;วัน&gt;/audio-HH.md · screen-HH.md</code> → <code>storage.readDay()</code></div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="rail"><div class="node clean"></div><div class="vline"></div></div>
+        <div class="stbody">
+          <div class="t c-clean">🧹 clean.js — ล้าง lossless <span class="tag pure">ฟังก์ชันเพียว</span></div>
+          <div class="d">ตัดประโยค/วลีซ้ำติดกัน (overlap) + บรรทัด UI chrome · เก็บทุกการตัดเข้า log</div>
+          <span class="out full">vault/&lt;วัน&gt;/_full.md</span><span class="out">vault/&lt;วัน&gt;/_removed.log</span>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="rail"><div class="node ai"></div><div class="vline"></div></div>
+        <div class="stbody">
+          <div class="t c-ai">🤖 analyze.js — วิเคราะห์ด้วย AI <span class="tag ait">OpenRouter</span></div>
+          <div class="d">cleanedText → AI → JSON: summary, topics, people, projects, todos · <b style="color:var(--warn)">ตรวจ entity grounding กันมั่ว</b></div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="rail"><div class="node"></div></div>
+        <div class="stbody">
+          <div class="t">📝 write-obsidian.js — เขียนโน้ต <span class="tag pure">ฟังก์ชันเพียว</span></div>
+          <div class="d">digest → โน้ต Obsidian + <code>[[wikilink]]</code> คน/โปรเจกต์ + ลิงก์ไปฉบับเต็ม</div>
+          <span class="out note">vault/&lt;วัน&gt;.md</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 outputs + sample -->
+<section>
+  <div class="wrap">
+    <div class="kick">ผลลัพธ์ · 3 ไฟล์ต่อวัน</div>
+    <h2>ฉบับเต็มคือของจริง · โน้ตสรุปคือชั้นเสริม</h2>
+    <div class="grid g3">
+      <div class="card"><h3 class="c-clean"><code>_full.md</code></h3><p style="font-size:14px;margin-top:6px">ข้อความสะอาดฉบับเต็ม ไม่ตัดเนื้อ — บันทึก lossless</p></div>
+      <div class="card"><h3 style="color:var(--warn)"><code>_removed.log</code></h3><p style="font-size:14px;margin-top:6px">ตัดอะไรไปบ้าง + เหตุผล ตรวจย้อนได้</p></div>
+      <div class="card"><h3 class="c-ai"><code>&lt;วัน&gt;.md</code></h3><p style="font-size:14px;margin-top:6px">โน้ตสรุป Obsidian + ลิงก์ความสัมพันธ์</p></div>
+    </div>
+    <h3 style="margin-top:28px">หน้าตาโน้ต Obsidian (Output B)</h3>
+    <pre><span class="c">---
+date: 2026-06-13
+source: PassiveINKEY
+tags: [lifelog, daily]
+---</span>
+<span class="k">## สรุปวัน</span>
+&lt;2–4 ประโยค&gt;
+<span class="k">## หัวข้อที่คุย</span>
+- ...
+<span class="k">## คน / โปรเจกต์</span>
+- <span class="g">[[ชื่อคน]]</span> · <span class="g">[[ชื่อโปรเจกต์]]</span>
+<span class="k">## สิ่งที่ต้องทำ / ตัดสินใจ</span>
+- [ ] ...
+<span class="k">## ↪ ฉบับเต็ม</span>
+<span class="g">[[2026-06-13/_full]]</span></pre>
+  </div>
+</section>
+
+<!-- กันมั่ว + error -->
+<section>
+  <div class="wrap">
+    <div class="kick">ความถูกต้อง · กันมั่ว + fail ปลอดภัย</div>
+    <div class="grid g2">
+      <div class="card">
+        <h3 class="c-ai">กันมั่ว (no hallucination)</h3>
+        <p style="font-size:15px;margin-top:6px">AI ตอบเป็น JSON แล้วเช็คว่า คน/โปรเจกต์ ที่ว่ามา <b style="color:var(--ink)">ปรากฏจริงในข้อความ</b> — ตัวไหนไม่เจอ ทิ้ง (log ไว้)</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--warn)">AI ล่ม → ข้อมูลไม่หาย</h3>
+        <p style="font-size:15px;margin-top:6px">ถ้า AI ล้มเหลว ยังเขียน <code>_full.md</code> เสมอ + โน้ตใส่หมายเหตุ "AI ไม่สำเร็จ" · บางชั่วโมงขาดก็ทำเท่าที่มี</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- เทส -->
+<section>
+  <div class="wrap">
+    <div class="kick">การเทส · TDD</div>
+    <h2>ของเพียวเทสในเครื่อง · ของ AI เทสบน Mac</h2>
+    <ul class="clean">
+      <li><code>clean.js</code> + <code>write-obsidian.js</code> = ฟังก์ชันเพียว → <code>node --test</code> ด้วย fixture จากข้อมูลจริง</li>
+      <li>เทสหลัก: <b>lossless</b> (เนื้อหาจริงไม่หาย), ตัดซ้ำได้จริง, โน้ตมี <code>[[links]]</code> ถูก</li>
+      <li><code>analyze.js</code> = ยิง API → เทสบน Mac: ตรวจสคีมา JSON + entity grounding</li>
+    </ul>
+  </div>
+</section>
+
+<!-- อนาคต -->
+<section style="border-bottom:none">
+  <div class="wrap">
+    <div class="kick">นอกขอบเขต · เฟสถัดไป</div>
+    <h2>ทำ MVP นี้ให้แน่นก่อน แล้วต่อยอด</h2>
+    <div class="road">
+      <span>Ingestion หลายแหล่ง</span>
+      <span>Storage + Ledger (ดัชนีค้น)</span>
+      <span>กราฟความสัมพันธ์ข้ามวัน</span>
+      <span>เคาน์เตอร์ถอน (MCP)</span>
+      <span>Security + Audit</span>
+    </div>
+    <p class="dim" style="margin-top:20px;font-size:14px">หมายเหตุ: โน้ต/ฉบับเต็มมีข้อมูลบุคคลที่สาม → vault gitignored อยู่ในเครื่อง · การกรองเหลือเฉพาะเสียงเจ้าของ (Voice ID) = อนาคต</p>
+  </div>
+</section>
+
+<div class="foot wrap">
+  P.D.B · Spec MVP "Daily Digest → Obsidian" · ร่างให้รีวิว 13 มิ.ย. 2026 · อิงไฟล์ docs/superpowers/specs/2026-06-13-daily-digest-to-obsidian-design.md
+</div>
+
+</body>
+</html>

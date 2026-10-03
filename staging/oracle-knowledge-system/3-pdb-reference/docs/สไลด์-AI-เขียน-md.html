@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI เขียน .md ยังไง — P.D.B</title>
+<style>
+  :root{
+    --bg:#0e0e10; --panel:#17171b; --panel2:#1e1e24; --line:#2c2c34;
+    --ink:#f4f4f6; --mut:#9a9aa6; --dim:#6c6c78;
+    --ai:#c77dff; --code:#37c98b; --md:#e0a23c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI","Sarabun",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  code,pre,.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+  .hero{padding:64px 0 28px;text-align:center;background:
+    radial-gradient(700px 320px at 50% -20%, rgba(199,125,255,.16), transparent 60%)}
+  .kick{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+  h1{font-size:38px;font-weight:800;letter-spacing:-.5px;margin-top:12px}
+  .answer{font-size:19px;color:var(--mut);max-width:680px;margin:14px auto 0}
+  .answer b{color:var(--ink)}
+  .hl{color:var(--ai);font-weight:700} .hl2{color:var(--code);font-weight:700}
+  /* key banner */
+  .banner{display:flex;gap:0;max-width:680px;margin:30px auto 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .banner .half{flex:1;padding:18px 20px}
+  .banner .l{background:rgba(199,125,255,.08);border-right:1px solid var(--line)}
+  .banner .r{background:rgba(55,201,139,.08)}
+  .banner .who{font-size:13px;font-weight:700;letter-spacing:.5px}
+  .banner .what{font-size:15px;color:var(--mut);margin-top:4px}
+  /* transformation */
+  section{padding:18px 0}
+  .step{max-width:760px;margin:0 auto}
+  .lbl{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;margin:0 0 8px 2px}
+  .chip{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px}
+  .chip.ai{background:rgba(199,125,255,.14);color:var(--ai)}
+  .chip.code{background:rgba(55,201,139,.14);color:var(--code)}
+  .chip.md{background:rgba(224,162,60,.14);color:var(--md)}
+  pre{background:#0a0a0c;border:1px solid var(--line);border-radius:12px;padding:15px 17px;
+    overflow-x:auto;font-size:12.5px;line-height:1.65;color:#cdd2da;white-space:pre-wrap;word-break:break-word}
+  pre .k{color:var(--ai)} pre .s{color:#9fd3a0} pre .c{color:var(--dim)} pre .h{color:var(--md)} pre .w{color:#85b7eb}
+  .arrow{text-align:center;font-size:22px;color:var(--dim);margin:8px 0}
+  .arrow .t{display:block;font-size:12px;color:var(--mut);font-weight:600;margin-top:-2px}
+  .border-ai{border-color:rgba(199,125,255,.4)} .border-code{border-color:rgba(55,201,139,.4)} .border-md{border-color:rgba(224,162,60,.4)}
+  /* why */
+  .why{max-width:760px;margin:22px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .why .b{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px}
+  .why .b h3{font-size:14px;font-weight:700} .why .b p{font-size:13px;color:var(--mut);margin-top:4px}
+  .note{max-width:760px;margin:18px auto 0;font-size:13.5px;color:var(--mut);border-left:3px solid var(--md);padding:4px 0 4px 14px}
+  .note b{color:var(--md)}
+  .foot{padding:34px 0 60px;text-align:center;color:var(--dim);font-size:13px}
+  @media(max-width:640px){.why{grid-template-columns:1fr}h1{font-size:29px}.banner{flex-direction:column}.banner .l{border-right:none;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kick">P.D.B · Daily Digest</div>
+    <h1>AI เขียน <span class="mono" style="color:var(--md)">.md</span> ยังไง?</h1>
+    <p class="answer">คำตอบสั้น: <b>AI ไม่ได้เขียน .md ตรงๆ</b> — <span class="hl">AI เขียนแค่ "เนื้อ" เป็น JSON</span> แล้ว <span class="hl2">โค้ด template เป็นคนเขียน "โครง" markdown</span></p>
+    <div class="banner">
+      <div class="half l"><div class="who" style="color:var(--ai)">🤖 AI ทำ</div><div class="what">คิด "เนื้อหา" → คืนเป็น JSON (สรุป/หัวข้อ/คน/ตัดสินใจ)</div></div>
+      <div class="half r"><div class="who" style="color:var(--code)">⚙️ โค้ดทำ</div><div class="what">จัด "โครงสร้าง" markdown ตาม template ตายตัว (หัวข้อ/ลิงก์/checkbox)</div></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="step">
+    <div class="lbl"><span class="chip ai">① OUTPUT จาก AI</span> ตอบเป็น JSON เท่านั้น (response_format: json_object)</div>
+    <pre class="border-ai"><span class="k">{</span>
+  <span class="k">"summary"</span>: <span class="s">"เจ้าหน้าที่กงสุลและผู้แทนจาก T-Hub จัดกิจกรรม..."</span>,
+  <span class="k">"topics"</span>: [<span class="s">"ความร่วมมือไทย-อินเดีย"</span>, <span class="s">"Soft Power"</span>, ...],
+  <span class="k">"people"</span>: [<span class="s">"Tushar Sharma"</span>, <span class="s">"สมสุข"</span>],
+  <span class="k">"projects"</span>: [<span class="s">"T-Hub"</span>, <span class="s">"India Dekho"</span>, ...],
+  <span class="k">"todos"</span>: [<span class="s">"หาแนวทางร่วมมือ T-Hub"</span>, ...],
+  <span class="k">"decisions"</span>: [<span class="s">"มุ่งเน้นร่วมมือกับ T-Hub..."</span>, ...]
+<span class="k">}</span>
+<span class="c">// → parseDigest() แกะ JSON · groundEntities() ทิ้งคน/โปรเจกต์ที่ไม่มีในต้นฉบับ</span></pre>
+  </div>
+</section>
+
+<div class="arrow">↓<span class="t">renderNote(date, digest) — ฟังก์ชันเพียว ไม่มี AI</span></div>
+
+<section>
+  <div class="step">
+    <div class="lbl"><span class="chip code">② TEMPLATE ในโค้ด</span> เท JSON ลงโครงตายตัว (write-obsidian.js)</div>
+    <pre class="border-code"><span class="c">---
+date: ${date}
+source: PassiveINKEY
+tags: [lifelog, daily]
+---</span>
+<span class="h">## สรุปวัน</span>
+${digest.summary}
+<span class="h">## หัวข้อที่คุย</span>
+${topics.map(t => <span class="s">`- ${t}`</span>)}
+<span class="h">## การตัดสินใจ</span>
+${decisions.map(d => <span class="s">`- ${d}`</span>)}
+<span class="h">## คน / โปรเจกต์</span>
+${ents.map(e => <span class="w">`[[${e}]]`</span>).join(<span class="s">' · '</span>)}
+<span class="h">## สิ่งที่ต้องทำ</span>
+${todos.map(t => <span class="s">`- [ ] ${t}`</span>)}
+<span class="h">## ↪ ฉบับเต็ม</span>
+<span class="w">[[${date}/_full]]</span></pre>
+  </div>
+</section>
+
+<div class="arrow">↓<span class="t">writeVault() เขียน string ลงไฟล์</span></div>
+
+<section>
+  <div class="step">
+    <div class="lbl"><span class="chip md">③ ผลลัพธ์</span> <span class="mono">vault/2026-06-13.md</span> (เปิดใน Obsidian)</div>
+    <pre class="border-md"><span class="c">---
+date: 2026-06-13
+source: PassiveINKEY
+tags: [lifelog, daily]
+---</span>
+<span class="h">## สรุปวัน</span>
+เจ้าหน้าที่กงสุลและผู้แทนจาก T-Hub จัดกิจกรรมแนะนำ
+ระบบนิเวศสตาร์ทอัพในไฮเดอราบัด...
+<span class="h">## คน / โปรเจกต์</span>
+<span class="w">[[Tushar Sharma]]</span> · <span class="w">[[สมสุข]]</span> · <span class="w">[[T-Hub]]</span> · <span class="w">[[India Dekho]]</span>
+<span class="h">## สิ่งที่ต้องทำ</span>
+- [ ] หาแนวทางความร่วมมือระหว่าง T-Hub และสตาร์ทอัพไทย</pre>
+  </div>
+</section>
+
+<section>
+  <div class="why">
+    <div class="b"><h3 class="hl2">รูปแบบไม่มีวันเพี้ยน</h3><p>หัวข้อ/ลิงก์/checkbox มาจาก template — AI พลาดได้แค่ "เนื้อหา" ไม่ใช่ format</p></div>
+    <div class="b"><h3 class="hl2">เทสได้ ไม่ต้องยิง AI</h3><p>renderNote เป็นฟังก์ชันเพียว → มี unit test คุมโครงโน้ตโดยตรง</p></div>
+    <div class="b"><h3 class="hl2">ได้ JSON ฟรีไปด้วย</h3><p>JSON ก้อนเดียวกันถูกเซฟเป็น <span class="mono">.json</span> = เมล็ด Vault/MCP ในอนาคต</p></div>
+  </div>
+  <p class="note"><b>ข้อควรรู้:</b> เพราะ AI คุม "เนื้อ" ความผิดที่เป็นไปได้คือเนื้อหาคลาดเคลื่อน (เช่น เคยเดาเดือน "สิงหาคม" ที่ไม่มีในต้นฉบับ) — แก้ด้วยการรัดกุม prompt + ground ฟิลด์ todos/decisions เพิ่ม ไม่ใช่ที่ตัว template</p>
+</section>
+
+<div class="foot wrap">P.D.B · AI เขียน JSON · โค้ดเขียน markdown · อิงโค้ดจริง lib/analyze.js + lib/write-obsidian.js</div>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตัวอย่างงานจริง — เก็บข้อมูล 2 แบบ</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#fff; --ink:#2b2b30; --mut:#6a6a74; --line:#ece8e1;
+    --bad:#ef4444; --bad-bg:#fdecec; --good:#10b981; --good-bg:#e7f7f0; --accent:#8b5cf6; --accent-bg:#f3effe;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:18px}
+  .wrap{max-width:820px;margin:0 auto;padding:0 22px}
+  section{padding:38px 0}
+  h1{font-size:36px;line-height:1.2;font-weight:800;letter-spacing:-.5px;text-align:center}
+  h2{font-size:25px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sub{color:var(--mut);font-size:19px;text-align:center;margin-top:10px}
+  p{color:var(--mut)} b{color:var(--ink)}
+  .hero{padding:58px 0 26px;text-align:center}
+  .tag{display:inline-block;font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-bg);border-radius:999px;padding:7px 18px;margin-bottom:18px}
+  /* metaphor */
+  .meta{background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:24px 26px;margin-top:8px;text-align:center;font-size:20px;font-weight:600;color:var(--ink)}
+  .meta .em{font-size:40px;display:block;margin-bottom:6px}
+  .meta .hl{color:var(--accent)}
+  /* toys */
+  .toys{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+  .toy{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:16px;font-weight:600}
+  /* way cards */
+  .way{border-radius:20px;padding:24px 26px;margin-top:16px}
+  .way.bad{background:var(--bad-bg);border:1px solid #f6c9c9}
+  .way.good{background:var(--good-bg);border:1px solid #c2ecd9}
+  .way h2{margin-bottom:4px}
+  .way.bad h2{color:var(--bad)} .way.good h2{color:var(--good)}
+  .ex{background:var(--card);border-radius:14px;padding:16px 18px;margin:14px 0;font-size:15.5px;font-family:"SF Mono",ui-monospace,monospace;color:var(--ink);line-height:1.7}
+  .ex .g{color:var(--good);font-weight:700} .ex .b{color:var(--bad);font-weight:700} .ex .d{color:var(--mut)}
+  .pc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .pc .h{font-weight:800;font-size:15px;margin-bottom:4px}
+  .pc ul{list-style:none} .pc li{font-size:15px;padding:4px 0;color:var(--ink)}
+  .pc .pro .h{color:var(--good)} .pc .con .h{color:var(--bad)}
+  .verdict{background:var(--ink);color:#fff;border-radius:22px;padding:30px;text-align:center;margin-top:10px}
+  .verdict h2{justify-content:center;color:#fff;font-size:24px}
+  .verdict p{color:#cfcfd6;font-size:19px;max-width:600px;margin:8px auto 0}
+  .verdict .hl{color:#c4b5fd;font-weight:700}
+  .foot{padding:26px 0 56px;color:#aaa;font-size:14px;text-align:center}
+  @media(max-width:680px){.pc{grid-template-columns:1fr}h1{font-size:28px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">ตัวอย่างงานจริงของคุณ · เข้าใจง่ายสุด</span>
+    <h1>เก็บข้อมูล 2 แบบ<br>แบบไหนดีกว่ากัน?</h1>
+    <div class="meta">
+      <span class="em">🧸</span>
+      เหมือน<span class="hl">เก็บของเล่น</span> — จะ<b>โยนรวมกล่องเดียว</b> หรือ<b>แยกใส่กล่องตามชนิด</b>?
+    </div>
+  </div>
+</header>
+
+<!-- YOUR DAY -->
+<section>
+  <div class="wrap">
+    <h2>📅 วันจริงของคุณ (13 มิ.ย.) มี "ของเล่น" พวกนี้</h2>
+    <p>ในวันเดียว คุณคุย/ทำหลายเรื่องปนกัน:</p>
+    <div class="toys">
+      <div class="toy">🇮🇳 ประชุม T-Hub อินเดีย</div>
+      <div class="toy">💻 โค้ด PassiveINKEY</div>
+      <div class="toy">🏦 ออกแบบ P.D.B</div>
+      <div class="toy">🤖 กลยุทธ์ Multi-LLM</div>
+      <div class="toy">🖥️ จอ (OCR) ปนมาด้วย</div>
+    </div>
+  </div>
+</section>
+
+<!-- WAY 1 -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <div class="way bad">
+      <h2>❌ แบบ 1 — โยนรวมกล่องเดียว <span style="font-size:15px;color:var(--mut);font-weight:600">(ที่ทำอยู่ตอนนี้)</span></h2>
+      <p>เอาทุกชั่วโมงยัดเข้าหมด ไม่แยก:</p>
+      <div class="ex">
+        วันที่ 13 มิ.ย. → ระบบสร้าง:<br>
+        <span class="d">• หน้า "ถอดเสียง 09:00–09:59"</span><br>
+        <span class="d">• หน้า "ถอดเสียง 10:00–10:59"</span><br>
+        <span class="d">• หน้า "OCR จอ 10:00–10:59"</span><br>
+        <span class="d">• หน้า "ถอดเสียง 11:00–11:59" …</span><br>
+        <span class="b">รวม ~50 หน้า/วัน → 564 หน้า ปนกันมั่ว</span><br>
+        <span class="d">เรื่อง T-Hub กระจายอยู่ 5 หน้า · P.D.B อยู่ 3 หน้า</span>
+      </div>
+      <div class="pc">
+        <div class="pro"><div class="h">✓ ข้อดี</div><ul>
+          <li>ง่าย ไม่ต้องคิด/ตั้งค่า</li>
+          <li>ครบทุกคำ ไม่ตกหล่น</li>
+        </ul></div>
+        <div class="con"><div class="h">✗ ข้อเสีย</div><ul>
+          <li>หาไม่เจอ (เรื่องเดียวกระจายหลายหน้า)</li>
+          <li>รกมาก (564 หน้า/วัน)</li>
+          <li>เปลือง + ช้า + พังง่าย</li>
+          <li>ของลับจากจอปนเข้าไปด้วย</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAY 2 -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <div class="way good">
+      <h2>✅ แบบ 2 — แยกใส่กล่องตามเรื่อง <span style="font-size:15px;color:var(--mut);font-weight:600">(แนะนำ)</span></h2>
+      <p>ตอนเย็น AI สรุป แยกเป็นเรื่อง ๆ:</p>
+      <div class="ex">
+        วันที่ 13 มิ.ย. → AI สรุปเป็น:<br>
+        <span class="g">📄 หน้า "T-Hub อินเดีย"</span> <span class="d">: คุยเข้าตลาด, India Market Access 6 เดือน, ลอง JETRO, ติดต่อ Tushar</span><br>
+        <span class="g">📄 หน้า "PassiveINKEY"</span> <span class="d">: แก้ bug, เพิ่มฟีเจอร์ล้างคำซ้ำ</span><br>
+        <span class="g">📄 หน้า "P.D.B"</span> <span class="d">: ออกแบบ session, ตัดสินใจใช้ daily digest</span><br>
+        <span class="g">รวม ~3–5 หน้า เรื่องละหน้า สะอาด</span>
+      </div>
+      <p style="font-size:15.5px;margin-bottom:8px">✨ ของเด็ด: พรุ่งนี้คุยเรื่อง T-Hub อีก → ไป<b>เติมหน้าเดิม</b> ไม่สร้างใหม่ → หน้า "T-Hub" รวยขึ้นเรื่อย ๆ</p>
+      <div class="pc">
+        <div class="pro"><div class="h">✓ ข้อดี</div><ul>
+          <li>หาง่าย (เรื่องละหน้า)</li>
+          <li>สะอาด ไม่กี่หน้า/วัน</li>
+          <li>ถูก + เร็ว + ไม่พัง</li>
+          <li>ของสะสมต่อยอด</li>
+          <li>กรองของลับได้</li>
+        </ul></div>
+        <div class="con"><div class="h">✗ ข้อเสีย</div><ul>
+          <li>ได้แค่ "ใจความ" (ดิบเต็มอยู่ในคลัง ขุดได้)</li>
+          <li>ต้องตั้งค่าครั้งแรก (ลิสต์เรื่อง/โปรเจกต์)</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VERDICT -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <div class="verdict">
+      <h2>🏆 แบบ 2 ชนะ</h2>
+      <p>ข้อเสียของแบบ 2 มี<span class="hl">นิดเดียว และแก้ได้</span> (เก็บไฟล์ดิบไว้ในคลังด้วย อยากดูรายละเอียดก็ขุดได้) · ส่วนข้อเสียของแบบ 1 = <span class="hl">ใช้จริงไม่ไหว</span> (564 หน้า/วัน ×365 วัน)</p>
+    </div>
+    <p class="sub" style="margin-top:18px;font-size:17px">สรุปสั้น: <b style="color:var(--ink)">ให้ AI สรุปวันละครั้ง แยกเป็นเรื่อง แล้วเติมหน้าเดิม</b> — ไม่ใช่สร้างหน้าใหม่ทุกชั่วโมง</p>
+  </div>
+</section>
+
+<div class="foot">ตัวอย่างงานจริง (13 มิ.ย.) · เก็บข้อมูล 2 แบบ · 14 มิ.ย. 2026</div>
+
+</body>
+</html>

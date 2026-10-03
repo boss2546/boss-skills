@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ออกแบบ — สรุปซ้อนชั้นตามเวลา (วัน→ปี)</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#fff; --ink:#2b2b30; --mut:#6a6a74; --line:#ece8e1;
+    --day:#3b82f6; --week:#8b5cf6; --month:#ec4899; --year:#f59e0b; --good:#10b981;
+    --accent:#8b5cf6; --accent-bg:#f3effe;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:17.5px}
+  .wrap{max-width:840px;margin:0 auto;padding:0 22px}
+  section{padding:40px 0}
+  h1{font-size:35px;line-height:1.2;font-weight:800;letter-spacing:-.5px;text-align:center}
+  h2{font-size:24px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .sub{color:var(--mut);font-size:18px;text-align:center;margin-top:10px}
+  p{color:var(--mut)} b{color:var(--ink)}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.85em;background:#f1eee8;padding:1px 6px;border-radius:5px;color:#5a4a8a}
+  .hero{padding:58px 0 24px;text-align:center}
+  .tag{display:inline-block;font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-bg);border-radius:999px;padding:7px 18px;margin-bottom:18px}
+  .one{background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:22px 26px;margin-top:8px;font-size:19px;font-weight:600;color:var(--ink);text-align:center}
+  .one .hl{color:var(--accent)}
+  /* telescope */
+  .tel{margin-top:10px}
+  .lv{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-bottom:12px}
+  .lv .left{flex:0 0 auto;width:96px;text-align:center}
+  .lv .em{font-size:30px;display:block}
+  .lv .nm{font-weight:800;font-size:16px}
+  .lv .right{flex:1;border-left:3px solid var(--line);padding-left:16px}
+  .lv .right .w{font-weight:700;color:var(--ink);font-size:15.5px}
+  .lv .right .d{font-size:14.5px;color:var(--mut)}
+  .lv.day{border-left:5px solid var(--day)} .lv.week{border-left:5px solid var(--week)} .lv.month{border-left:5px solid var(--month)} .lv.year{border-left:5px solid var(--year)}
+  .lv.day .nm{color:var(--day)} .lv.week .nm{color:var(--week)} .lv.month .nm{color:var(--month)} .lv.year .nm{color:var(--year)}
+  .arrow{text-align:center;color:#c9c5bd;font-size:22px;margin:-4px 0 8px}
+  /* example */
+  .ex{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 0;margin-top:14px;overflow:hidden}
+  .exrow{display:flex;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line);align-items:flex-start}
+  .exrow:last-child{border-bottom:none}
+  .exrow .lbl{flex:0 0 auto;width:80px;font-weight:800;font-size:14px}
+  .exrow.day .lbl{color:var(--day)} .exrow.week .lbl{color:var(--week)} .exrow.month .lbl{color:var(--month)} .exrow.year .lbl{color:var(--year)}
+  .exrow .txt{font-size:15px;color:var(--ink)}
+  .exrow .txt .dim{color:var(--mut)}
+  /* tip box */
+  .tip{background:var(--accent-bg);border:1px solid #e3d9fb;border-radius:16px;padding:20px 24px;margin-top:14px}
+  .tip h3{font-size:17px;font-weight:800;color:var(--accent);margin-bottom:4px}
+  .tip p{font-size:15.5px}
+  .stack{font-family:"SF Mono",monospace;font-size:13.5px;background:#f6f3ee;border-radius:12px;padding:14px 16px;margin-top:10px;color:var(--ink);line-height:1.7}
+  .stack .s{color:var(--good);font-weight:700} .stack .dim{color:var(--mut)}
+  /* who */
+  .who{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .wc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .wc h3{font-size:15.5px;font-weight:800;margin-bottom:3px}
+  .wc p{font-size:14px}
+  .sched{font-size:14px;color:var(--mut);margin-top:6px}
+  .sched b{color:var(--ink)}
+  .foot{padding:26px 0 56px;color:#aaa;font-size:13.5px;text-align:center}
+  @media(max-width:680px){.who{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">ออกแบบตามไอเดียคุณ · เข้าใจง่าย</span>
+    <h1>สรุปซ้อนชั้นตามเวลา<br><span style="font-size:21px;color:var(--mut);font-weight:700">วัน → สัปดาห์ → เดือน → ปี</span></h1>
+    <div class="one">
+      เหมือน <span class="hl">กล้องส่องทางไกล</span> 🔭 — ซูมเข้าเห็น<b>รายวันละเอียด</b> · ซูมออกเห็น<b>ทั้งปีในหน้าเดียว</b>
+    </div>
+  </div>
+</header>
+
+<!-- POSSIBLE -->
+<section style="padding-bottom:10px">
+  <div class="wrap">
+    <p class="sub"><b style="color:var(--good)">✅ เป็นไปได้แน่นอน</b> — และเป็นแพตเทิร์นที่คนใช้จริง (Obsidian เรียก "Periodic Notes") · ผมออกแบบให้ดีขึ้นนิดนึง ดังนี้</p>
+  </div>
+</section>
+
+<!-- TELESCOPE -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <h2>🔭 4 ชั้น — ยิ่งขึ้น ยิ่งสั้น ยิ่งภาพใหญ่</h2>
+    <div class="tel">
+      <div class="lv day"><div class="left"><span class="em">📄</span><span class="nm">วัน</span></div>
+        <div class="right"><div class="w">สรุปของวันนั้น แยกเป็นเรื่อง ๆ</div><div class="d">เย็นทุกวัน · ละเอียดสุด · ดิบเก็บไว้ข้างใต้</div></div></div>
+      <div class="arrow">▼ ครบ 7 วัน</div>
+      <div class="lv week"><div class="left"><span class="em">📑</span><span class="nm">สัปดาห์</span></div>
+        <div class="right"><div class="w">"สัปดาห์นี้คืบหน้าอะไร + ตัดสินใจอะไร"</div><div class="d">รวม 7 วัน + เขียนสรุปใหม่แนบบนสุด</div></div></div>
+      <div class="arrow">▼ ครบเดือน (ปฏิทินจริง)</div>
+      <div class="lv month"><div class="left"><span class="em">📚</span><span class="nm">เดือน</span></div>
+        <div class="right"><div class="w">"เดือนนี้ภาพใหญ่: โปรเจกต์ถึงไหน เปลี่ยนทิศไหม"</div><div class="d">รวมสัปดาห์ + สรุปใหม่แนบ</div></div></div>
+      <div class="arrow">▼ ครบปี</div>
+      <div class="lv year"><div class="left"><span class="em">🗂️</span><span class="nm">ปี</span></div>
+        <div class="right"><div class="w">"ปีนี้: เหตุการณ์สำคัญ การเติบโต บทเรียน"</div><div class="d">รวม 12 เดือน + สรุปปีหน้าเดียว</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAMPLE -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <h2>🧪 ตัวอย่างงานคุณจริง — เรื่อง "อินเดีย/T-Hub"</h2>
+    <div class="ex">
+      <div class="exrow day"><div class="lbl">📄 วัน</div><div class="txt">13 มิ.ย.: ประชุม T-Hub — คุยเข้าตลาดอินเดีย, India Market Access 6 เดือน, จะลองคุย JETRO, ติดต่อ Tushar <span class="dim">(ละเอียดเต็ม)</span></div></div>
+      <div class="exrow week"><div class="lbl">📑 สัปดาห์</div><div class="txt">9–15 มิ.ย.: <b>สำรวจโอกาสเข้าตลาดอินเดียผ่าน T-Hub</b> — ได้คอนแทกต์ Tushar, สนใจโปรแกรม 6 เดือน</div></div>
+      <div class="exrow month"><div class="lbl">📚 เดือน</div><div class="txt">มิ.ย.: <b>เปิดแนวทางขยายตลาดต่างประเทศ (อินเดียเป็นตัวเลือกแรก)</b></div></div>
+      <div class="exrow year"><div class="lbl">🗂️ ปี</div><div class="txt">2026: <b>เริ่มมองตลาด global ให้สตาร์ทอัพ</b> — อินเดีย, ญี่ปุ่น (JETRO)…</div></div>
+    </div>
+    <p class="sub" style="font-size:16px;margin-top:14px">เห็นไหมครับ — เรื่องเดียวกัน "หดสั้นลง + ภาพใหญ่ขึ้น" ทุกชั้น 👆</p>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section style="padding-top:6px">
+  <div class="wrap">
+    <h2>✨ 2 เคล็ดที่ทำให้มัน "ดี" จริง</h2>
+    <div class="tip">
+      <h3>1. สรุปต้อง "ซูมออก" ไม่ใช่ "กองรวม"</h3>
+      <p>สรุปเดือน <b>ไม่ใช่</b> เอาสรุป 30 วันมาแปะต่อกัน (งั้นก็ยาวเท่าเดิม) · แต่ต้อง<b>ยกระดับ</b>เป็น "ภาพใหญ่ของเดือน" — สั้นลงจริง</p>
+    </div>
+    <div class="tip" style="margin-top:12px">
+      <h3>2. เก็บของดิบไว้ "ข้างใต้" สรุป (ไม่หาย)</h3>
+      <p>แต่ละไฟล์ = <b>สรุปอยู่บน</b> (อ่านอันนี้) + <b>ของละเอียดพับไว้ข้างล่าง</b> (อยากขุดก็กดดู) — ตรงหลัก lossless ที่คุณย้ำ</p>
+      <div class="stack">
+<span class="s"># สรุปสัปดาห์ (อ่านตรงนี้พอ)</span>
+สัปดาห์นี้: สำรวจตลาดอินเดีย, build P.D.B prototype...
+<span class="dim">---- ▼ รายละเอียด 7 วัน (พับไว้ ขุดได้) ----</span>
+<span class="dim">[วันจันทร์] ... [วันอังคาร] ... [วันพุธ] ...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO / SCHEDULE -->
+<section style="padding-top:6px;border-top:1px solid var(--line)">
+  <div class="wrap">
+    <h2>⚙️ ใครทำ + ทำเมื่อไหร่ (ตามเวลาจริง)</h2>
+    <div class="who">
+      <div class="wc"><h3>🏦 P.D.B = เครื่องม้วนสรุป</h3><p>ทำหน้าที่ "ม้วน" วัน→สัปดาห์→เดือน→ปี (ต่อยอดจาก digest ที่เขียนไว้แล้ว)</p></div>
+      <div class="wc"><h3>📚 LLM Wiki = ที่เก็บ+ค้น</h3><p>เก็บไฟล์สรุปทุกชั้น + ค้น/ถามได้ + ทำกราฟ</p></div>
+    </div>
+    <p class="sched" style="margin-top:14px">⏰ ตั้งเวลาจริง: <b>ทุกเย็น</b> = สรุปวัน · <b>อาทิตย์คืน</b> = ม้วนสัปดาห์ · <b>สิ้นเดือน</b> = ม้วนเดือน · <b>31 ธ.ค.</b> = ม้วนปี (อัตโนมัติ ไม่ต้องสั่ง)</p>
+    <div class="tip" style="margin-top:16px">
+      <h3>🎁 โบนัส: มี 2 แกนคู่กัน</h3>
+      <p><b>แกนเวลา</b> (วัน→ปี ที่ออกแบบนี้) = "ช่วงนั้นเกิดอะไร" · คู่กับ <b>แกนเรื่อง</b> (หน้า T-Hub / P.D.B ที่สะสม) = "ทุกอย่างเรื่อง X" · สรุปวันเดียวกันป้อนทั้ง 2 แกน → ครบทุกมุม</p>
+    </div>
+  </div>
+</section>
+
+<div class="foot">ออกแบบ "สรุปซ้อนชั้นตามเวลา" ตามไอเดียคุณ · PassiveINKEY × P.D.B × LLM Wiki · 14 มิ.ย. 2026</div>
+
+</body>
+</html>

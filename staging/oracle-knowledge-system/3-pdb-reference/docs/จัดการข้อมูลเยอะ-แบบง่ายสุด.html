@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการข้อมูลเยอะ — แบบง่ายสุด</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#fff; --ink:#2b2b30; --mut:#6a6a74; --line:#ece8e1;
+    --accent:#8b5cf6; --accent-bg:#f3effe; --good:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:18px}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  section{padding:40px 0}
+  h1{font-size:38px;line-height:1.2;font-weight:800;letter-spacing:-.5px;text-align:center}
+  .sub{color:var(--mut);font-size:19px;text-align:center;margin-top:10px}
+  p{color:var(--mut)} b{color:var(--ink)}
+  .hero{padding:64px 0 30px;text-align:center}
+  .tag{display:inline-block;font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-bg);border-radius:999px;padding:7px 18px;margin-bottom:20px}
+  /* analogy */
+  .big{background:var(--card);border:2px solid var(--accent);border-radius:22px;padding:26px 28px;margin-top:8px;
+    font-size:21px;font-weight:600;color:var(--ink);text-align:center;box-shadow:0 10px 30px rgba(139,92,246,.10)}
+  .big .hl{color:var(--accent)}
+  .big .em{font-size:42px;display:block;margin-bottom:6px}
+  /* rules */
+  .rule{display:flex;gap:18px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;margin-bottom:14px}
+  .rule .ic{font-size:38px;flex:0 0 auto;line-height:1}
+  .rule h3{font-size:21px;font-weight:800;margin-bottom:3px}
+  .rule p{font-size:16.5px}
+  .rule .ex{font-size:15px;color:var(--mut);margin-top:5px;font-style:italic}
+  .rule .ex b{color:var(--accent);font-style:normal}
+  /* final */
+  .final{background:var(--ink);color:#fff;border-radius:22px;padding:32px 30px;text-align:center}
+  .final h2{font-size:24px;font-weight:800;color:#fff;margin-bottom:8px}
+  .final p{color:#cfcfd6;font-size:19px;max-width:560px;margin:0 auto}
+  .final .hl{color:#c4b5fd;font-weight:700}
+  .foot{padding:28px 0 60px;color:#aaa;font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">เวอร์ชันง่ายสุด · ไม่มีศัพท์ยาก</span>
+    <h1>ข้อมูลเยอะทุกวัน<br>จัดการง่าย ๆ ยังไง</h1>
+    <div class="big">
+      <span class="em">🧑‍💼</span>
+      คิดว่ามี <span class="hl">"เลขาที่ฟังคุณทั้งวัน"</span> — ตอนเย็นมัน<span class="hl">สรุปให้</span>ว่ามีอะไรสำคัญ <b>ไม่ใช่โยนเทปทั้งวันให้คุณฟังเอง</b>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="sub" style="margin-bottom:22px">โลกเขาทำกัน <b style="color:var(--ink)">5 ข้อนี้</b> — เท่านี้พอ:</p>
+
+    <div class="rule">
+      <div class="ic">🗑️</div>
+      <div><h3>1. เก็บแต่ของสำคัญ</h3>
+        <p>ไม่ต้องเก็บทุกคำ — เก็บแค่เรื่องสำคัญ คนสำคัญ การตัดสินใจ</p>
+        <div class="ex">เหมือนเขียน<b>ไดอารี่</b> — ไม่ได้จดทุกวินาที จดแค่ที่อยากจำ</div></div>
+    </div>
+
+    <div class="rule">
+      <div class="ic">🤖</div>
+      <div><h3>2. ให้ AI จัดให้ อย่าจัดเอง</h3>
+        <p>ปล่อยให้ AI แยกของเข้าที่ — คุณไม่ต้องนั่งจัด</p>
+        <div class="ex">เพราะถ้าต้องมานั่งคิดว่า "เก็บตรงไหนดี" ทุกครั้ง <b>เดี๋ยวก็เลิกทำ</b></div></div>
+    </div>
+
+    <div class="rule">
+      <div class="ic">📁</div>
+      <div><h3>3. เก็บตาม "เรื่อง" ไม่ใช่ตาม "วัน"</h3>
+        <p>1 เรื่อง = 1 ที่ ที่โตขึ้นเรื่อย ๆ (เช่น โฟลเดอร์ "งาน A")</p>
+        <div class="ex">ไม่ใช่กองใหม่ทุกวัน — เปิดดู "งาน A" ทีเดียวเห็นหมด <b>ไม่ต้องไล่ทีละวัน</b></div></div>
+    </div>
+
+    <div class="rule">
+      <div class="ic">✂️</div>
+      <div><h3>4. ของเก่าย่อให้สั้นลง</h3>
+        <p>วันนี้เก็บละเอียด · เดือนที่แล้วเหลือแค่สรุปสั้น ๆ</p>
+        <div class="ex">เหมือนความทรงจำคน — <b>เรื่องเก่าจำแค่ใจความ</b> ไม่ใช่ทุกรายละเอียด</div></div>
+    </div>
+
+    <div class="rule">
+      <div class="ic">💬</div>
+      <div><h3>5. หาโดย "ถาม" ไม่ใช่ "ไล่ดู"</h3>
+        <p>อยากรู้อะไรก็ถาม AI ได้เลย</p>
+        <div class="ex">ถาม <b>"เรื่อง T-Hub ว่าไงบ้าง?"</b> แทนการเลื่อนหาทีละวัน</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:10px">
+  <div class="wrap">
+    <div class="final">
+      <h2>🎯 สรุปสั้นสุด</h2>
+      <p>ให้มัน <span class="hl">สรุปวันละครั้ง แยกเป็นเรื่อง ๆ</span> แล้วเก็บแค่นั้น<br>— ไม่ใช่เก็บทุกไฟล์ทุกชั่วโมงเหมือนตอนนี้</p>
+    </div>
+  </div>
+</section>
+
+<div class="foot">เวอร์ชันง่ายสุดของ "จัดการข้อมูลเยอะ" · 14 มิ.ย. 2026</div>
+
+</body>
+</html>

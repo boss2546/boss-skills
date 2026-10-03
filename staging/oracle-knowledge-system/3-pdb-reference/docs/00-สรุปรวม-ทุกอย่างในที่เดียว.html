@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สรุปรวม — ทุกอย่างในที่เดียว</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#fff; --ink:#2b2b30; --mut:#6a6a74; --line:#ece8e1;
+    --done:#10b981; --done-bg:#e7f7f0; --wait:#f59e0b; --wait-bg:#fdf3e1; --info:#6366f1;
+    --cap:#3b82f6; --pdb:#8b5cf6; --wiki:#ec4899;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16.5px}
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px}
+  section{padding:34px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:34px;font-weight:800;letter-spacing:-.5px;text-align:center}
+  h2{font-size:21px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:9px}
+  .sub{color:var(--mut);font-size:18px;text-align:center;margin-top:8px}
+  p{color:var(--mut)} b{color:var(--ink)}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.85em;background:#f1eee8;padding:1px 6px;border-radius:5px;color:#5a4a8a}
+  .hero{padding:48px 0 22px;text-align:center}
+  .tag{display:inline-block;font-size:14px;font-weight:700;color:var(--info);background:#eeeefe;border-radius:999px;padding:7px 18px;margin-bottom:16px}
+  .tagn{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:6px}
+  .t-done{background:var(--done-bg);color:#0a7a55} .t-wait{background:var(--wait-bg);color:#9a6206}
+  /* components */
+  .comp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .cc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 18px;border-left:4px solid var(--line)}
+  .cc.cap{border-left-color:var(--cap)} .cc.pdb{border-left-color:var(--pdb)} .cc.wiki{border-left-color:var(--wiki)} .cc.git{border-left-color:var(--done)}
+  .cc h3{font-size:15.5px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .cc p{font-size:13.5px;margin-top:3px}
+  /* lists */
+  ul.clean{list-style:none;margin-top:4px}
+  ul.clean li{padding:6px 0 6px 24px;position:relative;color:var(--mut);font-size:15px}
+  ul.clean li::before{content:"";position:absolute;left:4px;top:13px;width:7px;height:7px;border-radius:50%;background:var(--done)}
+  ul.clean li b{color:var(--ink)}
+  ul.dec li::before{background:var(--info)}
+  ul.next li::before{background:var(--wait)}
+  /* docs */
+  .docgrp{margin-top:14px}
+  .docgrp .gh{font-weight:800;font-size:15px;color:var(--ink);margin:12px 0 6px}
+  .docs{display:flex;flex-wrap:wrap;gap:7px}
+  .doc{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--mut)}
+  /* flow */
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px;font-size:14px;font-weight:600}
+  .fb{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+  .ar{color:#c9c5bd;font-weight:800}
+  .now{background:var(--wait-bg);border:1px solid #f3dcae;border-radius:14px;padding:16px 20px;margin-top:14px;font-size:15.5px}
+  .now b{color:#9a6206}
+  .foot{padding:30px 0 60px;color:#aaa;font-size:13px;text-align:center}
+  @media(max-width:680px){.comp{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">control panel · ทุกอย่างในที่เดียว</span>
+    <h1>สรุปรวมโปรเจกต์</h1>
+    <p class="sub">เราอยู่ตรงไหน · ทำอะไรไปแล้ว · ตัดสินใจอะไร · เหลืออะไร — 14 มิ.ย. 2026</p>
+  </div>
+</header>
+
+<!-- FLOW -->
+<section>
+  <div class="wrap">
+    <h2>🔄 ภาพรวมระบบ (ปลายทางที่ออกแบบไว้)</h2>
+    <div class="flow">
+      <span class="fb" style="border-left:3px solid var(--cap)">🎙️ PassiveINKEY<br><small style="color:var(--mut)">อัดเสียง/จอ</small></span>
+      <span class="ar">→</span>
+      <span class="fb" style="border-left:3px solid var(--pdb)">🏦 P.D.B<br><small style="color:var(--mut)">ล้าง + สรุป + ม้วน</small></span>
+      <span class="ar">→</span>
+      <span class="fb" style="border-left:3px solid var(--wiki)">📚 LLM Wiki<br><small style="color:var(--mut)">วิกิ + กราฟ + ถาม</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- COMPONENTS -->
+<section>
+  <div class="wrap">
+    <h2>🧩 4 ชิ้นส่วน + สถานะ</h2>
+    <div class="comp">
+      <div class="cc cap"><h3>PassiveINKEY <span class="tagn t-done">ใช้ได้</span></h3><p>อัดเสียง+จอ → ถอดข้อความ · มีข้อมูลแล้ว 3 วัน · <b>เหลือ:</b> เพิ่ม timestamp ราย segment</p></div>
+      <div class="cc pdb"><h3>P.D.B <span class="tagn t-done">ทำงานได้</span></h3><p>digest (ล้าง+สรุปรายวัน) ทำได้ + ต่อท่อเข้า LLM Wiki แล้ว · <b>เหลือ:</b> ฟังก์ชัน "ม้วน" สัปดาห์/เดือน/ปี</p></div>
+      <div class="cc wiki"><h3>LLM Wiki (แอป) <span class="tagn t-done">รันอยู่</span></h3><p>build จากซอร์สสำเร็จ + ใช้ Claude local (ฟรี) · <b>ปัญหา:</b> ดูดดิบ = 564 หน้า/วัน (เยอะไป)</p></div>
+      <div class="cc git"><h3>GitHub <span class="tagn t-done">push แล้ว</span></h3><p><code>boss2546/pdb-llm-wiki</code> (Private) · เก็บโค้ด fork + ที่แก้ทั้งหมด</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DONE -->
+<section>
+  <div class="wrap">
+    <h2>✅ ทำอะไรไปแล้ว</h2>
+    <ul class="clean">
+      <li>ศึกษา + <b>ชำแหละโค้ด LLM Wiki</b> ละเอียด (มีเอกสาร)</li>
+      <li><b>build LLM Wiki จากซอร์สสำเร็จ</b> (ลง Node/Rust/protobuf) + เปิดแอป + แชทไทยได้</li>
+      <li><b>เพิ่มโค้ด "ล้างคำซ้ำ"</b> (passiveinkey-clean.ts) เข้า LLM Wiki + เทส 6/6 ผ่าน + push GitHub</li>
+      <li><b>ตั้ง Scheduled Import</b> → ดึง PassiveINKEY อัตโนมัติ (ได้ 564 หน้า — เห็นว่าแบบดิบไม่สเกล)</li>
+      <li><b>ออกแบบระบบจัดการข้อมูล</b> เสร็จ (สรุปซ้อนชั้น วัน→ปี + จับคู่เสียง/จอ + ดูต้นทางได้)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- DECISIONS -->
+<section>
+  <div class="wrap">
+    <h2>🧭 ตัดสินใจอะไรไปแล้ว (อย่ารื้อ)</h2>
+    <ul class="clean dec">
+      <li><b>ใช้ LLM Wiki เป็นระบบหลัก</b> · P.D.B = ชั้น "ล้าง+สรุป+ม้วน" (ไม่สร้างวิกิเองจากศูนย์)</li>
+      <li><b>ไม่ป้อนดิบ</b> — ป้อน "สรุป" แทน (วัน→สัปดาห์→เดือน→ปี) เพื่อกัน 564 หน้า/วัน</li>
+      <li><b>เสียง+จอ จับคู่ด้วย "เวลา"</b> เป็นก้อนเดียว · เก็บดิบไว้ตลอด กดดูต้นทางได้</li>
+      <li><b>หน่วยเล็กสุด = วัน เสมอ</b> · สัปดาห์/เดือน/ปี = จุดม้วนสรุป แล้ววนใหม่</li>
+      <li>เรื่อง GPL = ไม่สนช่วง prototype</li>
+    </ul>
+  </div>
+</section>
+
+<!-- DOCS -->
+<section>
+  <div class="wrap">
+    <h2>📚 เอกสารที่ทำไว้ (อยู่ในโฟลเดอร์ docs)</h2>
+    <div class="docgrp">
+      <div class="gh">① เข้าใจ LLM Wiki</div>
+      <div class="docs">
+        <span class="doc">นำเสนอ-LLM-Wiki-vs-Obsidian</span>
+        <span class="doc">ชำแหละ-LLM-Wiki-โค้ดจริง</span>
+        <span class="doc">เข้าใจง่าย-LLM-Wiki-คืออะไร</span>
+      </div>
+      <div class="gh">② สถานะ/ระบบ</div>
+      <div class="docs">
+        <span class="doc">สรุปสถานะ-ตอนนี้</span>
+        <span class="doc">สรุป-ระบบทำงาน-และอัพเกรด</span>
+      </div>
+      <div class="gh">③ ออกแบบการจัดการข้อมูล (เรื่องที่คุยล่าสุด)</div>
+      <div class="docs">
+        <span class="doc">ระดมสมอง-จัดการข้อมูลเยอะ</span>
+        <span class="doc">จัดการข้อมูลเยอะ-แบบง่ายสุด</span>
+        <span class="doc">ตัวอย่างจริง-เก็บข้อมูล2แบบ</span>
+        <span class="doc">ออกแบบ-สรุปซ้อนชั้นตามเวลา</span>
+        <span class="doc">นำเสนอ-วงจรม้วนสรุป</span>
+        <span class="doc">แบบเด็กเข้าใจ-ไดอารี่ที่หดได้</span>
+        <span class="doc">ดูต้นทางได้-จับคู่เสียงกับจอ</span>
+        <span class="doc">นำเสนอ-วิธีจัดการวันที่ซับซ้อน</span>
+        <span class="doc">นำเสนอ-จัดการข้อมูล-เซสชัน</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEXT -->
+<section style="border-bottom:none">
+  <div class="wrap">
+    <h2>🔜 เหลือทำอะไร (ขั้นต่อไป)</h2>
+    <ul class="clean next">
+      <li><b>เขียนฟังก์ชัน "ม้วน" (rollup)</b> ใน P.D.B — สัปดาห์/เดือน/ปี (ต่อจาก digest เดิม)</li>
+      <li><b>เพิ่ม timestamp</b> ใน PassiveINKEY — เพื่อจับคู่เสียง+จอตามเวลา</li>
+      <li><b>เปลี่ยน Scheduled Import</b> → ชี้โฟลเดอร์ "สรุป" แทน "ดิบ" (แก้ปัญหา 564 หน้า)</li>
+    </ul>
+    <div class="now">
+      📍 <b>ตอนนี้อยู่ตรงนี้:</b> ระบบเดินได้จริงแล้ว (แบบดิบ/firehose) · ออกแบบทางแก้เสร็จแล้ว · <b>ขั้นถัดไป = ลงมือเขียน rollup</b> เพื่อเปลี่ยนจาก "ดิบเยอะ" → "สรุปเป็นระเบียบ"
+    </div>
+  </div>
+</section>
+
+<div class="foot">สรุปรวมโปรเจกต์ PassiveINKEY × P.D.B × LLM Wiki · 14 มิ.ย. 2026</div>
+
+</body>
+</html>

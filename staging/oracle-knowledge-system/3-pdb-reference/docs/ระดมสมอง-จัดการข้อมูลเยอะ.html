@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระดมสมอง — จัดการข้อมูลเข้าเยอะทุกวันยังไง</title>
+<style>
+  :root{
+    --bg:#0e0e10; --panel:#17171b; --panel2:#1e1e24; --line:#2c2c34;
+    --ink:#f4f4f6; --mut:#9a9aa6; --dim:#6c6c78;
+    --c1:#5b8cff; --c2:#c77dff; --c3:#37c98b; --c4:#e0a23c; --c5:#e0696c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun",-apple-system,"Segoe UI",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:34px;line-height:1.22;font-weight:800;letter-spacing:-.5px}
+  h2{font-size:23px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:9px}
+  h3{font-size:16px;font-weight:800;margin-bottom:4px}
+  .kick{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+  .lead{font-size:17.5px;color:var(--mut);max-width:860px;margin-top:10px}
+  p{color:var(--mut)} b{color:var(--ink)} .dim{color:var(--dim)}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.85em;background:var(--panel2);padding:1px 6px;border-radius:5px;color:#cdd2da}
+  a{color:var(--c2)}
+  .hero{padding:64px 0 44px;background:
+    radial-gradient(820px 340px at 80% -10%, rgba(199,125,255,.14), transparent 60%),
+    radial-gradient(620px 300px at 6% 0%, rgba(91,140,255,.12), transparent 60%)}
+  .badge{display:inline-flex;gap:9px;align-items:center;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--mut);
+    border:1px solid var(--line);border-radius:999px;padding:6px 15px;margin-bottom:18px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--c3);display:inline-block}
+  .one{background:var(--panel);border:2px solid var(--c2);border-radius:16px;padding:20px 24px;margin-top:22px;font-size:17px;font-weight:600;color:var(--ink)}
+  /* philosophy/tool cards */
+  .grid{display:grid;gap:13px;margin-top:20px}
+  .g2{grid-template-columns:1fr 1fr}
+  .row{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;border-left:4px solid var(--line)}
+  .row.a{border-left-color:var(--c5)} .row.b{border-left-color:var(--c2)} .row.c{border-left-color:var(--c3)} .row.d{border-left-color:var(--c4)} .row.e{border-left-color:var(--c1)}
+  .row h3{font-size:15.5px} .row p{font-size:14px;margin-top:3px}
+  .tool{font-size:11.5px;font-weight:700;background:var(--panel2);border-radius:6px;padding:2px 8px;color:#cdd2da;margin-right:5px;display:inline-block;margin-top:6px}
+  /* idea board */
+  .board{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:20px}
+  .col{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .col .ch{font-size:14px;font-weight:800;padding:6px 10px;border-radius:8px;display:inline-block;margin-bottom:10px}
+  .col.A .ch{background:rgba(224,105,108,.15);color:var(--c5)}
+  .col.B .ch{background:rgba(199,125,255,.15);color:var(--c2)}
+  .col.C .ch{background:rgba(55,201,139,.15);color:var(--c3)}
+  .col.D .ch{background:rgba(224,162,60,.15);color:var(--c4)}
+  .col.E .ch{background:rgba(91,140,255,.15);color:var(--c1)}
+  .idea{font-size:13.5px;color:var(--mut);padding:7px 0;border-bottom:1px dashed var(--line)}
+  .idea:last-child{border-bottom:none}
+  .idea b{color:var(--ink)}
+  .idea .src{font-size:11px;color:var(--dim)}
+  ul.clean{list-style:none;margin-top:8px}
+  ul.clean li{padding:8px 0 8px 26px;position:relative;color:var(--mut);font-size:15.5px;border-bottom:1px solid var(--line)}
+  ul.clean li:last-child{border-bottom:none}
+  ul.clean li::before{content:"";position:absolute;left:5px;top:16px;width:8px;height:8px;border-radius:50%;background:var(--c3)}
+  ul.clean li b{color:var(--ink)}
+  ul.clean li .n{position:absolute;left:0;top:6px;font-weight:800;color:var(--c3);font-size:13px}
+  .hibox{background:rgba(91,140,255,.06);border:1px solid rgba(91,140,255,.28);border-radius:15px;padding:22px 24px;margin-top:18px}
+  .hibox h2{color:var(--c1)}
+  .foot{padding:34px 0 60px;color:var(--dim);font-size:12.5px;text-align:center}
+  .foot a{color:var(--dim)}
+  @media(max-width:720px){.g2{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span> ระดมสมอง · ค้นตลาด + ผู้ใช้จริง · 14 มิ.ย. 2026</span>
+    <h1>ข้อมูลเข้าเยอะทุกวัน — โลกเขาจัดการกันยังไง</h1>
+    <div class="one">
+      สิ่งที่ทุกคน (ตลาด + ผู้ใช้ Obsidian) เห็นตรงกัน: <b>อย่าเก็บทุกอย่างเป็น "หน้า" — สกัดของสำคัญ + ให้ AI จัด + ค้นแบบ hybrid</b> · "จัดเอง" คือศัตรู
+    </div>
+  </div>
+</header>
+
+<!-- MARKET -->
+<section>
+  <div class="wrap">
+    <div class="kick">ส่วนที่ 1 · ตลาด/เครื่องมือทำยังไง</div>
+    <h2>🏪 5 ปรัชญาหลักในตลาด</h2>
+    <div class="grid">
+      <div class="row a"><h3>🔴 "ค้นอย่างเดียว ไม่ต้องจัด"</h3><p>เก็บทุกอย่างดิบ → ค้นแบบ Google + ถาม AI · ไม่พยายามไฟล์เข้าโฟลเดอร์</p><span class="tool">Rewind</span><span class="tool">Limitless</span><span class="tool">Screenpipe (open-source)</span><p class="dim" style="font-size:12px;margin-top:5px">หมายเหตุ: Rewind โดน Meta ซื้อ ธ.ค. 2025 · Screenpipe = ตัว local แทน (ใกล้ PassiveINKEY มาก)</p></div>
+      <div class="row b"><h3>🟣 "AI จัดให้ ด้วย supertag"</h3><p>แท็กชนิด (meeting/project/task) แล้ว AI สกัด transcript ใส่ field ให้เอง · โครงสร้างโผล่จากการแท็ก ไม่ต้องตั้งล่วงหน้า</p><span class="tool">Tana</span><span class="tool">Mem</span><span class="tool">Reflect</span></div>
+      <div class="row c"><h3>🟢 "เก็บเฉพาะของสำคัญ" (salience)</h3><p>สกัด "ของเด่น" ไม่เก็บหมด · แยก memory 3 แบบ (ข้อเท็จจริง / เหตุการณ์ / วิธีทำ) · ประหยัด token 90%</p><span class="tool">Mem0</span></div>
+      <div class="row d"><h3>🟡 "จัดตามการใช้งาน" (วิธีคน)</h3><p><b>PARA</b> = Projects/Areas/Resources/Archives (จัดตามactionable) · <b>Zettelkasten</b> = โน้ตอะตอม+ลิงก์ · <b>Progressive Summarization</b> = ย่อเฉพาะตอนกลับมาอ่านจริง</p></div>
+      <div class="row e"><h3>🔵 "ค้นแบบไหน" (เทคโนโลยี)</h3><p>Vector RAG (เร็ว สเกลง่าย ความหมาย) vs GraphRAG (ความสัมพันธ์ multi-hop) → <b>Hybrid คืออนาคต</b> — และ <b>LLM Wiki มี hybrid อยู่แล้ว!</b></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section>
+  <div class="wrap">
+    <div class="kick">ส่วนที่ 2 · ผู้ใช้ Obsidian/ชุมชน แชร์ยังไง</div>
+    <h2>👥 แพตเทิร์นที่คนใช้จริงทำกัน</h2>
+    <p class="lead">มีคนทำ <b>Voice Memo → Claude Code → Obsidian</b> จริง ๆ (ใกล้ของคุณมาก) · นี่คือสิ่งที่ชุมชนตกผลึกแล้ว:</p>
+    <div class="grid g2">
+      <div class="row b"><h3>🗺️ MOC (Map of Content)</h3><p>แทนโฟลเดอร์ ใช้ "หน้าดัชนี" ลิงก์ของตามหัวข้อ · = หน้า entity/project ของเรานั่นเอง</p></div>
+      <div class="row b"><h3>📥 Fleeting / Inbox MOC</h3><p>กล่องรับของที่ยังไม่จัด · จัดเสร็จค่อยย้ายออก = ระบบ triage (เหมือน Review queue ของ LLM Wiki)</p></div>
+      <div class="row d"><h3>📅 Periodic Notes (rollup)</h3><p>daily → weekly → monthly → yearly · ย่อขึ้นเรื่อย ๆ = ของเก่าถูกบีบเป็นธีม</p></div>
+      <div class="row e"><h3>🧭 Daily note = "ฮับของวัน"</h3><p>ไม่ใช่ที่เก็บหลัก — ทุกอย่าง (เสียง/ประชุม) แค่ลิงก์จากมัน ไว้ดูภาพรวมวัน</p></div>
+      <div class="row c"><h3>⚙️ Dataview (จัดตัวเอง)</h3><p>vault จัดระเบียบเองด้วย query ("หาโน้ต tag=pdb ทั้งหมด") = บทบาทเดียวกับกราฟ/index ของ LLM Wiki</p></div>
+      <div class="row a"><h3>⚡ Automate capture</h3><p>กฎทอง: <b>"capture ต้องเป็นรีเฟล็กซ์ ไม่ใช่การตัดสินใจ"</b> — อย่าให้ต้องคิดว่าจะไฟล์ตรงไหน ไม่งั้นเลิกทำ</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- IDEA BOARD -->
+<section>
+  <div class="wrap">
+    <div class="kick">ส่วนที่ 3 · กระดานไอเดีย</div>
+    <h2>💡 35+ ไอเดีย จัดเป็น 5 หมวด</h2>
+    <div class="board">
+      <div class="col A">
+        <span class="ch">A · ลดปริมาณ (อย่าจม)</span>
+        <div class="idea"><b>สกัด salient</b> ไม่เก็บหมด — เก็บแค่ การตัดสินใจ/ข้อเท็จจริง/คน/todo <span class="src">(Mem0)</span></div>
+        <div class="idea"><b>รวมเป็นเซสชัน</b> (เสียง+จอตามเวลา) ไม่ใช่รายไฟล์</div>
+        <div class="idea"><b>Progressive summarization</b> — ดิบค้นได้ ย่อเฉพาะตอน flag/กลับมาอ่าน</div>
+        <div class="idea"><b>กฎ "ไม่เก็บ"</b> — ไถฟีด/ดูหนัง/ช่วงว่าง = ทิ้ง</div>
+        <div class="idea"><b>Dedup ข้ามวัน</b> — คุยโปรเจกต์เดิม = อัปเดตหน้าเดิม ไม่สร้างใหม่</div>
+        <div class="idea"><b>Tiered retention</b> — วันเต็ม / สัปดาห์ย่อ / เดือนเหลือธีม</div>
+        <div class="idea"><b>Importance threshold</b> — เกินเกณฑ์ค่อยขึ้นวิกิ</div>
+      </div>
+      <div class="col B">
+        <span class="ch">B · โครงสร้าง</span>
+        <div class="idea"><b>PARA</b> — projects / areas / resources / archives</div>
+        <div class="idea"><b>Supertags แบบ Tana</b> — ติดชนิด+field ให้ AI เติม</div>
+        <div class="idea"><b>Entity-centric</b> — หน้า "T-Hub" สะสมข้ามวัน</div>
+        <div class="idea"><b>MOC/Daily = ดัชนี</b> ไม่ใช่ที่เก็บ</div>
+        <div class="idea"><b>2 ชั้น</b> — คลังดิบ (ค้น) + วิกิ (ของดี)</div>
+        <div class="idea"><b>People layer</b> — personal CRM: ใครพูด/รับปากอะไร</div>
+        <div class="idea"><b>Inbox MOC</b> — ที่พักของยังไม่จัด</div>
+      </div>
+      <div class="col C">
+        <span class="ch">C · ค้นหา/ดึง</span>
+        <div class="idea"><b>Search-first</b> — ทำทุกอย่างค้นได้ แล้วถาม AI <span class="src">(Rewind)</span></div>
+        <div class="idea"><b>เปิด vector</b> ใน LLM Wiki (LanceDB) ตอนข้อมูลโต</div>
+        <div class="idea"><b>ค้นตามเวลา</b> — "บ่ายอังคารทำอะไร"</div>
+        <div class="idea"><b>ค้นตาม entity</b> — "ทุกอย่างเรื่อง P.D.B"</div>
+        <div class="idea"><b>Ask-your-day</b> — ถาม AI สรุปวัน/สัปดาห์</div>
+        <div class="idea"><b>Resurfacing</b> — เด้งของเก่าที่เกี่ยวขึ้นมาเอง</div>
+      </div>
+      <div class="col D">
+        <span class="ch">D · ให้ AI ทำแทน</span>
+        <div class="idea"><b>Auto-classify → route</b> เซสชันเข้าโปรเจกต์</div>
+        <div class="idea"><b>AI daily digest</b> — คืนละ "5 บรรทัด/โปรเจกต์"</div>
+        <div class="idea"><b>Weekly/monthly rollup</b> — ย่อของเก่าอัตโนมัติ</div>
+        <div class="idea"><b>Typed memory</b> — แยก fact/event/how-to <span class="src">(Mem0)</span></div>
+        <div class="idea"><b>Contradiction detect</b> — เตือนเมื่อแผน/ความคิดเปลี่ยน</div>
+        <div class="idea"><b>Review queue</b> — ชัวร์ไฟล์เอง ไม่ชัวร์ถามคุณ</div>
+      </div>
+      <div class="col E">
+        <span class="ch">E · เฉพาะเคสคุณ (P.D.B)</span>
+        <div class="idea"><b>Decision Journal</b> — สกัด "การตัดสินใจ + วิธีคิด" (= decision DNA แกนธุรกิจ!) ไม่ใช่ทุกคำ</div>
+        <div class="idea"><b>Voice ID</b> (resemblyzer) — แยกเสียงคุณ = ตัวตนจริง</div>
+        <div class="idea"><b>OCR = สัญญาณบริบท</b> (อยู่แอป/เอกสารไหน) → ใช้ classify ไม่ใช่เก็บเป็นเนื้อหา</div>
+        <div class="idea"><b>Privacy tiers</b> — ส่วนตัว local-only / งาน → วิกิ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SYNTHESIS -->
+<section>
+  <div class="wrap">
+    <div class="hibox">
+      <h2>🎯 5 ข้อที่ทุกคนเห็นตรงกัน (ตลาด + ชุมชน)</h2>
+      <ul class="clean">
+        <li><span class="n">1</span><b>Automate capture</b> — capture เป็นรีเฟล็กซ์ อย่าให้ต้องคิดจะไฟล์ตรงไหน</li>
+        <li><span class="n">2</span><b>อย่าเก็บทุกอย่างเป็น "หน้า"</b> — สกัดของสำคัญ (salience) ที่เหลือเป็นแค่คลังค้นได้</li>
+        <li><span class="n">3</span><b>ใช้ "ดัชนี/MOC/entity" แทนโฟลเดอร์</b> — ของสะสมที่หน้าหัวข้อ ไม่ใช่หน้าใหม่ทุกวัน</li>
+        <li><span class="n">4</span><b>ย่อแบบ progressive/rollup</b> เมื่อเวลาผ่าน — ของเก่าบีบเป็นธีม</li>
+        <li><span class="n">5</span><b>ค้นแบบ hybrid (vector + graph)</b> ไม่ใช่ไล่ดูทีละวัน</li>
+      </ul>
+    </div>
+
+    <h2 style="margin-top:30px">⭐ จุดที่เคสคุณ "ต่าง" จากทุกคน</h2>
+    <p class="lead">ตลาดส่วนใหญ่เก็บ "ทุกอย่างเพื่อความจำ" · แต่ของคุณคือสตาร์ทอัพ <b>Decision DNA</b> — ของมีค่าสุด = <b>"การตัดสินใจ + วิธีคิดของคุณ"</b> ไม่ใช่ทุกคำพูด · ฉะนั้นเป้าการสกัดควรเล็งไปที่ <b>การตัดสินใจ</b> เป็นหลัก (แคบกว่า = จัดการง่ายกว่า + ตรงธุรกิจ)</p>
+  </div>
+</section>
+
+<!-- DIRECTIONS -->
+<section style="border-bottom:none">
+  <div class="wrap">
+    <div class="kick">ส่วนที่ 5 · ทิศที่น่าลอง (เลือกได้)</div>
+    <h2>🧪 ถ้าจะลงมือ — 4 ทิศ</h2>
+    <ul class="clean">
+      <li><span class="n">›</span><b>AI Daily Digest → entity</b> — ทุกคืน P.D.B ย่อวันเป็น "ต่อโปรเจกต์ 5 บรรทัด" → เข้า LLM Wiki (ลดจาก ~50 หน้า → ไม่กี่หน้า)</li>
+      <li><span class="n">›</span><b>เปิด Vector search</b> ใน LLM Wiki — รองรับสเกลตอนข้อมูลโต</li>
+      <li><span class="n">›</span><b>Taxonomy + Auto-classify</b> — ลิสต์ลิ้นชัก → AI ไฟล์เซสชันเข้าโปรเจกต์</li>
+      <li><span class="n">›</span><b>Decision-extraction</b> — สกัดเฉพาะ "การตัดสินใจ/วิธีคิด" เป็นชั้นพิเศษ (ตรงแกน P.D.B)</li>
+    </ul>
+    <p class="dim" style="margin-top:14px">ยังไม่ลงมือ — นี่คือ "พาสแรก" ของการระดมสมอง · อยากให้เจาะทิศไหนลึก หรือหาไอเดีย/เคสเพิ่มอีก บอกได้ ทำต่อได้เรื่อย ๆ</p>
+  </div>
+</section>
+
+<div class="foot">
+  ระดมสมองจากตลาด (Rewind/Screenpipe, Tana/Mem, Mem0, PARA/Zettelkasten, GraphRAG/Vector) + ชุมชน Obsidian (MOC, Periodic Notes, voice→AI workflow) · 14 มิ.ย. 2026
+</div>
+
+</body>
+</html>
