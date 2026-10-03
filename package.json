@@ -1,7 +1,7 @@
 {
   "name": "boss-ai",
-  "version": "1.5.0",
-  "description": "Universal AI Agent Skills: Docker 3-Tier Workflow, Enterprise Production Architecture (NGINX, Cloudflare, Log Rotation), Git Team Workflow, AI API Gateway (9Router & LLM Routing), and Oracle External Brain Lifecycle (~/ψ Vault) for Claude Code, Cursor, Copilot, Antigravity, Windsurf, Cline",
+  "version": "1.6.0",
+  "description": "Universal AI Agent Skills: Docker 3-Tier Workflow, Enterprise Production Architecture (NGINX, Cloudflare, Log Rotation), Git Team Workflow, AI API Gateway (9Router & LLM Routing), Oracle External Brain Lifecycle (~/ψ Vault), and Maymint Companion Soul & Memory for Claude Code, Cursor, Copilot, Antigravity, Windsurf, Cline",
   "main": "bin/install.js",
   "bin": {
     "boss-ai": "bin/install.js",
@@ -12,6 +12,7 @@
   "files": [
     "bin",
     "skills",
+    "maymint-core",
     "README.md"
   ],
   "keywords": [
@@ -40,7 +41,12 @@
     "standup",
     "rrr",
     "vault",
-    "lifecycle"
+    "lifecycle",
+    "maymint",
+    "companion",
+    "soul",
+    "persona",
+    "memory"
   ],
   "author": "Boss (ratchanon2003)",
   "license": "MIT"
