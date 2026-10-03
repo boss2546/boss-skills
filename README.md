@@ -1,9 +1,10 @@
-# 👑 BOSS AI (v1.3.1) — Universal Skills Installer
+# 👑 BOSS AI (v1.4.0) — Universal Skills Installer
 
 แพ็กเกจติดตั้งชุดสกิลมาตรฐานระดับสากลสำหรับนักพัฒนาและสาย Vibe Coding:
 1. **`🐳 docker-workflow`**: การพัฒนาเว็บด้วย Docker 3 ตู้ (หน้าบ้าน, หลังบ้าน, โกดังวัตถุดิบ, ดูฐานข้อมูลผ่านเว็บ Adminer, แก้โค้ดสด Live Reload, ปลดล็อก CORS, ภาษาไทย utf8mb4)
 2. **`🏭 production-architecture`**: การยกระดับสู่ Production ระดับองค์กร (NGINX Gateway พร้อม Dynamic DNS Resolver, 4 เสาหลักความทนทานระดับองค์กร, Log Rotation กันดิสก์เต็ม, Dynamic RAM, กำแพงไฟ UFW, Cloudflare ซ่อน IP และสำรองข้อมูลอัตโนมัติ)
 3. **`🌿 git-team-workflow`**: การทำงานร่วมกันเป็นทีมด้วย Git (โมเดลจุดเซฟเกม, ไม่ใช้ศัพท์ยาก, AI จัดการ Add/Commit/Push/PR และแก้ Conflict ให้อัตโนมัติ)
+4. **`🌐 meuu-api-gateway`**: สกิลกลางแม่บท AI Infrastructure เชื่อมต่อ 9Router Gateway (OpenAI v1 + Claude Native, Claude Sonnet 4.6, Gemini 2.5 Flash, Multimodal Vision, เสียงพูด TTS ภาษาไทย, ถอดเสียง STT 2.7s และโควต้า 12,000 req/สัปดาห์)
 
 ติดตั้งให้กับ **AI Assistants ทุกตัวในโลก** ได้ในคำสั่งเดียว!
 
@@ -69,6 +70,14 @@ npx boss-ai --global
 * **ลูปทำงาน 7 ขั้นตอน:** Main ➔ Branch ➔ Work ➔ Commit ➔ Push ➔ PR ➔ Sync
 * **AI ดูแลให้อัตโนมัติ:** ช่วย Add, Commit, Push, Pull, สร้าง Branch และช่วยคลี่คลาย Merge Conflict
 * **ความปลอดภัยสูงสุด:** ห้าม Force Push, ห้ามขอ Password/Token ในแชท และมี `.gitignore` เสมอ
+
+### 4. 🌐 Meuu AI API Gateway (9Router Infrastructure)
+* **Central Base URL:** `https://api.meuu.club/v1` รองรับทั้ง OpenAI API v1 และ Anthropic Claude Messages API
+* **โมเดลระดับท็อป:** `ag/claude-sonnet-4-6` (เขียนโค้ดและ Tool Calling ขั้นสูง), `ag/gemini-2.5-flash` (แชทความเร็วสูง วิเคราะห์รูปภาพ Vision และถอดเสียง)
+* **Text-to-Speech (TTS):** สังเคราะห์เสียงพูดภาษาไทยธรรมชาติความเร็วสูง (`edge-tts/th-TH-PremwadeeNeural`, `edge-tts/th-TH-NiwatNeural`)
+* **Speech-to-Text (STT) 2.7s:** ถอดความเสียงเป็นข้อความความเร็วแสง และโฟลว์ลัด "ฟังเสียงแล้วตอบทันที" ใน 3.64 วินาที
+* **บริหารโควต้า 12,000 req/สัปดาห์:** ระบบ Round-Robin และ Auto-Failover สลับ 6 บัญชีอัตโนมัติภายใน 50ms เมื่อติด Rate Limit
+* **คู่มือเชื่อมต่อครบ 7 ค่าย:** วิธีตั้งค่าเชื่อมต่อกับ Cursor IDE, Claude Code CLI, Cline, Roo Code, Continue.dev, Windsurf และ SDKs (Python, LangChain, Vercel AI SDK)
 
 ---
 

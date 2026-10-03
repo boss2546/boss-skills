@@ -8,9 +8,10 @@ const args = process.argv.slice(2);
 const isGlobal = args.includes('--global') || args.includes('-g');
 
 // ตัวเลือกคัดกรองสกิล (ค่าเริ่มต้น: ติดตั้งครบทุกสกิล)
-const installDocker = !args.includes('--git-only') && !args.includes('--prod-only');
-const installProd = !args.includes('--git-only') && !args.includes('--docker-only');
-const installGit = !args.includes('--docker-only') && !args.includes('--prod-only');
+const installDocker = !args.includes('--git-only') && !args.includes('--prod-only') && !args.includes('--gateway-only');
+const installProd = !args.includes('--git-only') && !args.includes('--docker-only') && !args.includes('--gateway-only');
+const installGit = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--gateway-only');
+const installGateway = !args.includes('--docker-only') && !args.includes('--prod-only') && !args.includes('--git-only');
 
 // ตัวเลือกคัดกรอง AI (ถ้าไม่ระบุ AI ใดๆ เจาะจง ให้ติดตั้งครบทุก AI)
 const aiFlags = ['--antigravity', '--gemini', '--claude', '--cursor', '--copilot', '--codex', '--windsurf', '--cline', '--roo', '--aider', '--all'];
@@ -36,7 +37,8 @@ console.log('===================================================================
 const skillsList = [
   installDocker ? '🐳 1. docker-workflow (3-Tier & Dev)' : '',
   installProd ? '🏭 2. production-architecture (NGINX & Enterprise)' : '',
-  installGit ? '🌿 3. git-team-workflow' : ''
+  installGit ? '🌿 3. git-team-workflow' : '',
+  installGateway ? '🌐 4. meuu-api-gateway (AI API Gateway & Router)' : ''
 ].filter(Boolean);
 console.log(`📦 สกิลที่จะติดตั้ง: \n   ${skillsList.join('\n   ')}`);
 const osName = os.platform() === 'darwin' ? 'Mac' : os.platform() === 'linux' ? 'Linux / Server' : 'ระบบ';
@@ -46,6 +48,7 @@ console.log('🤖 AI ที่รองรับ: Claude Code, Cursor, GitHub Co
 const dockerSkillSrc = path.join(packageRoot, 'skills', 'docker-workflow');
 const prodSkillSrc = path.join(packageRoot, 'skills', 'production-architecture');
 const gitSkillSrc = path.join(packageRoot, 'skills', 'git-team-workflow');
+const gatewaySkillSrc = path.join(packageRoot, 'skills', 'meuu-api-gateway');
 
 // 1. สรุปกฎ Docker Workflow สำหรับ AI
 const dockerRuleSummary = `
@@ -111,6 +114,26 @@ When managing git, commits, branches, pull requests, or collaborating with teamm
    - When conflicts occur, carefully explain both versions in plain language and ask the user how to resolve them.
    - NEVER ask the user to paste tokens/passwords in chat.
 4. **Full Reference**: Read detailed guides in \`.agents/skills/git-team-workflow/SKILL.md\`.
+`;
+
+// 4. สรุปกฎ Meuu AI API Gateway สำหรับ AI
+const gatewayRuleSummary = `
+## 🌐 Meuu AI API Gateway Standards (api.meuu.club)
+When connecting to or integrating with the central AI API Gateway (9Router):
+1. **Central Gateway URL & Auth**:
+   - Base URL: \`https://api.meuu.club/v1\`
+   - Master API Key: \`sk-07ccde1e709eb2ca-e05r6c-a11b5d7c\`
+   - Quota: 12,000 req/week across 6 auto-failover load balanced accounts.
+2. **Recommended AI Models**:
+   - \`ag/claude-sonnet-4-6\`: Coding, complex reasoning, autonomous agents, and tool calling.
+   - \`ag/gemini-2.5-flash\`: High-speed chat, multimodal vision, OCR, fast STT (2.7s), and direct audio processing.
+   - \`edge-tts/th-TH-PremwadeeNeural\` / \`edge-tts/th-TH-NiwatNeural\`: High quality natural Thai TTS.
+3. **Dual Protocol Endpoints**:
+   - OpenAI v1: \`POST /v1/chat/completions\` (Chat, Vision, Audio Input).
+   - Anthropic Native: \`POST /v1/messages\` (Header: \`x-api-key\`, \`anthropic-version: 2023-06-01\`).
+   - Text-to-Speech (TTS): \`POST /v1/audio/speech\` (\`{"model": "edge-tts/th-TH-PremwadeeNeural", "input": text, "voice": "..."}\`).
+   - Models List: \`GET /v1/models\`.
+4. **Full Reference**: Read detailed request/response schemas and code examples in \`.agents/skills/meuu-api-gateway/SKILL.md\`.
 `;
 
 // Helper: คัดลอกโฟลเดอร์แบบ recursive
@@ -203,6 +226,10 @@ try {
       copyDirSync(gitSkillSrc, path.join(agyGlobal, 'git-team-workflow'));
       installedList.push(`[Antigravity Global] -> ~/.gemini/config/skills/git-team-workflow`);
     }
+    if (installGateway && fs.existsSync(gatewaySkillSrc)) {
+      copyDirSync(gatewaySkillSrc, path.join(agyGlobal, 'meuu-api-gateway'));
+      installedList.push(`[Antigravity Global] -> ~/.gemini/config/skills/meuu-api-gateway`);
+    }
 
     // 2. Claude Code Global (~/.claude/skills/)
     const claudeGlobal = path.join(home, '.claude', 'skills');
@@ -218,12 +245,17 @@ try {
       copyDirSync(gitSkillSrc, path.join(claudeGlobal, 'git-team-workflow'));
       installedList.push(`[Claude Code Global]  -> ~/.claude/skills/git-team-workflow`);
     }
+    if (installGateway && fs.existsSync(gatewaySkillSrc)) {
+      copyDirSync(gatewaySkillSrc, path.join(claudeGlobal, 'meuu-api-gateway'));
+      installedList.push(`[Claude Code Global]  -> ~/.claude/skills/meuu-api-gateway`);
+    }
 
     // 3. Cursor Global (~/.cursorrules)
     const cursorGlobal = path.join(home, '.cursorrules');
     if (installDocker) safeInjectRule(cursorGlobal, dockerRuleSummary, 'DOCKER-WORKFLOW');
     if (installProd) safeInjectRule(cursorGlobal, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
     if (installGit) safeInjectRule(cursorGlobal, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+    if (installGateway) safeInjectRule(cursorGlobal, gatewayRuleSummary, 'MEUU-API-GATEWAY');
     installedList.push(`[Cursor IDE Global]   -> ~/.cursorrules`);
 
   } else {
@@ -273,6 +305,10 @@ try {
         copyDirSync(gitSkillSrc, path.join(agySkills, 'git-team-workflow'));
         installedList.push(`[Antigravity / Gemini] -> .agents/skills/git-team-workflow`);
       }
+      if (installGateway && fs.existsSync(gatewaySkillSrc)) {
+        copyDirSync(gatewaySkillSrc, path.join(agySkills, 'meuu-api-gateway'));
+        installedList.push(`[Antigravity / Gemini] -> .agents/skills/meuu-api-gateway`);
+      }
       if (installDocker) {
         safeInjectRule(path.join(cwd, 'AGENTS.md'), dockerRuleSummary, 'DOCKER-WORKFLOW');
         safeInjectRule(path.join(cwd, 'GEMINI.md'), dockerRuleSummary, 'DOCKER-WORKFLOW');
@@ -285,6 +321,10 @@ try {
         safeInjectRule(path.join(cwd, 'AGENTS.md'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
         safeInjectRule(path.join(cwd, 'GEMINI.md'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
       }
+      if (installGateway) {
+        safeInjectRule(path.join(cwd, 'AGENTS.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
+        safeInjectRule(path.join(cwd, 'GEMINI.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
+      }
       installedList.push(`[Antigravity Rules]     -> AGENTS.md & GEMINI.md`);
     }
 
@@ -293,12 +333,14 @@ try {
       if (installDocker) safeInjectRule(path.join(cwd, 'CLAUDE.md'), dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(path.join(cwd, 'CLAUDE.md'), prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(path.join(cwd, 'CLAUDE.md'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(path.join(cwd, 'CLAUDE.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
 
       const claudeSkills = path.join(cwd, '.claude', 'skills');
       if (installDocker && fs.existsSync(dockerSkillSrc)) copyDirSync(dockerSkillSrc, path.join(claudeSkills, 'docker-workflow'));
       if (installProd && fs.existsSync(prodSkillSrc)) copyDirSync(prodSkillSrc, path.join(claudeSkills, 'production-architecture'));
       if (installGit && fs.existsSync(gitSkillSrc)) copyDirSync(gitSkillSrc, path.join(claudeSkills, 'git-team-workflow'));
-      installedList.push(`[Claude Code]           -> CLAUDE.md & .claude/skills/ (3 สกิล)`);
+      if (installGateway && fs.existsSync(gatewaySkillSrc)) copyDirSync(gatewaySkillSrc, path.join(claudeSkills, 'meuu-api-gateway'));
+      installedList.push(`[Claude Code]           -> CLAUDE.md & .claude/skills/ (4 สกิล)`);
     }
 
     // 3. Cursor IDE (.cursorrules + .cursor/rules/*.mdc)
@@ -306,6 +348,7 @@ try {
       if (installDocker) safeInjectRule(path.join(cwd, '.cursorrules'), dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(path.join(cwd, '.cursorrules'), prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(path.join(cwd, '.cursorrules'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(path.join(cwd, '.cursorrules'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
 
       const cursorMdcDir = path.join(cwd, '.cursor', 'rules');
       fs.mkdirSync(cursorMdcDir, { recursive: true });
@@ -318,6 +361,9 @@ try {
       if (installGit) {
         fs.writeFileSync(path.join(cursorMdcDir, 'git-team-workflow.mdc'), `---\ndescription: Git Team Workflow for Collaboration\nglobs: "**/*"\n---\n${gitRuleSummary}`, 'utf8');
       }
+      if (installGateway) {
+        fs.writeFileSync(path.join(cursorMdcDir, 'meuu-api-gateway.mdc'), `---\ndescription: Meuu AI API Gateway Standards (api.meuu.club)\nglobs: "**/*"\n---\n${gatewayRuleSummary}`, 'utf8');
+      }
       installedList.push(`[Cursor IDE]            -> .cursorrules & .cursor/rules/*.mdc`);
     }
 
@@ -327,6 +373,7 @@ try {
       if (installDocker) safeInjectRule(copilotPath, dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(copilotPath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(copilotPath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(copilotPath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
       installedList.push(`[Copilot / Codex]       -> .github/copilot-instructions.md`);
     }
 
@@ -336,12 +383,14 @@ try {
       if (installDocker) safeInjectRule(windsurfPath, dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(windsurfPath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(windsurfPath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(windsurfPath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
 
       const windsurfDir = path.join(cwd, '.windsurf', 'rules');
       fs.mkdirSync(windsurfDir, { recursive: true });
       if (installDocker) safeInjectRule(path.join(windsurfDir, 'docker-workflow.md'), dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(path.join(windsurfDir, 'production-architecture.md'), prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(path.join(windsurfDir, 'git-team-workflow.md'), gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(path.join(windsurfDir, 'meuu-api-gateway.md'), gatewayRuleSummary, 'MEUU-API-GATEWAY');
       installedList.push(`[Windsurf (Codeium)]    -> .windsurfrules & .windsurf/rules/`);
     }
 
@@ -351,6 +400,7 @@ try {
       if (installDocker) safeInjectRule(clinePath, dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(clinePath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(clinePath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(clinePath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
       installedList.push(`[Cline / Roo Code]      -> .clinerules`);
     }
 
@@ -360,6 +410,7 @@ try {
       if (installDocker) safeInjectRule(aiderPath, dockerRuleSummary, 'DOCKER-WORKFLOW');
       if (installProd) safeInjectRule(aiderPath, prodRuleSummary, 'PRODUCTION-ARCHITECTURE');
       if (installGit) safeInjectRule(aiderPath, gitRuleSummary, 'GIT-TEAM-WORKFLOW');
+      if (installGateway) safeInjectRule(aiderPath, gatewayRuleSummary, 'MEUU-API-GATEWAY');
       installedList.push(`[Aider]                 -> CONVENTIONS.md`);
     }
   }
