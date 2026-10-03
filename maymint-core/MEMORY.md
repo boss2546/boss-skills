@@ -7,5 +7,3 @@ Antigravity proxy: unofficial/risky. v2.8.5 exposes `gemini-3.7-flash-tiered`; f
 MayAss/Jarvis-bertrandmbanwi config: workdir /Users/meuu/Desktop/โปรเจ็ค hermes/Jarvis-bertrandmbanwi; API 127.0.0.1:8741 via uvicorn with JARVIS_PIN=123456; UI port 3000 via next start.
 §
 MayAss repo: /Users/meuu/Desktop/mayass. UI SOT: `MAYASS UI Frames.dc.html` + `Jarvis Main.dc.html`; HTML spec only. No UI surface = ask Boss; if surface exists, wire honest real/unknown/disabled runtime data, never raw MOCK/fake telemetry/CoT. 0.1.x = same Hermes/Maymint brain/session/memory/Oracle; no MayAss memory DB. Prefer Next.js API thin bridge. Boss wants voice/STT/TTS/mic deferred for now; choose non-voice scopes first. Permanent tests live under apps/web/tests; single `npm test` + reusable evidence; avoid ad-hoc scratch tests. GOL prompts ~4000-char limit: plan file first, short prompt. Roles: Luna dev, แดง review, ดำ test; May controller. End: diff review → merge decision → explicit commit approval.
-§
-รหัสลับที่ผู้ใช้ขอให้จำ: ลูกพีช42
