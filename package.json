@@ -1,6 +1,6 @@
 {
   "name": "boss-ai",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Universal AI Agent Skills: Docker 3-Tier Workflow, Enterprise Production Architecture (NGINX, Cloudflare, Log Rotation), Git Team Workflow, AI API Gateway (9Router & LLM Routing), Oracle External Brain Lifecycle (~/ψ Vault), and Maymint Companion Soul & Memory for Claude Code, Cursor, Copilot, Antigravity, Windsurf, Cline",
   "main": "bin/install.js",
   "bin": {
